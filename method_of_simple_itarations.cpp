@@ -17,7 +17,7 @@ int main()
         std::cout<<vec<<mat*res;
     }
     catch(int err){
-        if(err == 1)
+        if(err == 1)                    /// Это плохо
             std::cout<<"The sum of diagonal elements is greater than the sum of the remaining";
         if(err == 2)
             std::cout<<"Zero on main diagonal";
