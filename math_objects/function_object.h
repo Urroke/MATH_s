@@ -6,7 +6,7 @@ template <typename input,typename output>
 class math_function{
 private:
     output(*func)(input);
-    class solve_proxi;
+    class integral;
     int C(int n,int k);
 
     template <typename lhs, typename rhs>
@@ -26,18 +26,14 @@ public:
 
     ~math_function();
 
-    template <typename type>
-    solve_proxi operator==(const type& exemp);
-
     template <typename temp = enable_type_arithmetic<output>>
     output operator()(const input& argument);
 
     template <typename temp2 = enable_type_arithmetic<output>>
-    output derivative(input argument,int n,int degree,double delta);
+    output derivative(input argument, int n, int degree, input delta);
 
-    template <typename temp2 = enable_type_arithmetic<output>>
-    output integral(double a,double b);
 };
 
+#include "integral.cpp"
 #include "function_object.cpp"
 #endif

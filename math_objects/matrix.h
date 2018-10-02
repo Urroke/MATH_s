@@ -67,8 +67,16 @@ public:
     operator*(const matrix<lhs,Y,X>& lhs_value,const mvector<rhs,X>& rhs_value);
 
     template<typename lhs,typename rhs,size_t Y,size_t X,typename temp>
+    friend mvector<typename common_type<lhs,rhs>::type,Y>
+    operator*(const mvector<lhs,X>& lhs_value, const matrix<rhs,Y,X>& rhs_value);
+
+    template<typename lhs,typename rhs,size_t Y,size_t X,typename temp>
     friend matrix<typename common_type<lhs,rhs>::type,Y,X>
     operator*(const matrix<lhs,Y,X>& lhs_value,const rhs& rhs_value);
+
+    template<typename lhs,typename rhs,size_t Y,size_t X,typename temp>
+    friend matrix<typename common_type<lhs,rhs>::type,Y,X>
+    operator*(const lhs& lhs_value, const matrix<rhs,Y,X>& rhs_value);
 
     template<typename lhs,typename rhs,size_t Y,size_t X,typename temp>
     friend matrix<typename common_type<lhs,rhs>::type,Y,X>

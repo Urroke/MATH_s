@@ -10,7 +10,7 @@
 #include <stdexcept>
 #include <vector>
 #include <ctime>
-#include <typeinfo.h>
 #include <conio.h>
 #include <cstdlib>
+#include <random>
 #endif // SUPPORT_LIBS_H_INCLUDED

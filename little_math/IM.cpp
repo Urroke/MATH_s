@@ -3,7 +3,7 @@
 #include "little_math.h"
 
 template <typename type, size_t size>
-mvector<type,size> IM(matrix<type,size,size> mat, mvector<type,size>
+mvector<type,size> simple_iteration(matrix<type,size,size> mat, mvector<type,size>
                         vec, double eps, mvector<type,size> initial_approx, std::string options)
 {
     int* numbers = new int[size];
@@ -62,12 +62,65 @@ mvector<type,size> IM(matrix<type,size,size> mat, mvector<type,size>
     return result;
 }
 
+template <typename type, size_t size>
+mvector<type,size> BiCGStab(matrix<type,size,size> A, mvector<type,size>
+                        b, double eps, mvector<type,size> x)
+{
+    mvector<type, size> r, r_, p, r1, x1, s, p1;
+    type alpha, beta, w;
+    int count = 0;
+    r = b - A*x;
+    p = r;
+    r_ = r;
+    do{
+        std::cout<<x<<"\t"<<r_.normalized()*r.normalized()<<"\n";
+        alpha = (r_*r)/((A*p)*r_);
+        s = r - A*p*alpha;
+        w = ((A*s)*s)/((A*s)*(A*s));
+        x1 = x + p*alpha + s*w;
+        r1 = s - A*s*w;
+        beta = (alpha*(r1*r_))/(w*(r*r_));
+        p1 = r1 + (p - A*p*w)*beta;
+        x = x1;
+        r = r1;
+        p = p1;
+    }
+    while(r1.magnitude() > eps);
+    return x1;
+    /*
+
+    while(true){
+            count++;
+        a = (r*r_)/((mat*p)*r_);
+        s = r - (mat*p)*a;
+        if(s.magnitude() < eps){
+            x1 = x + p*a;
+            break;
+        }
+        w = ((mat*s)*s)/((mat*s)*(mat*s));
+        x1 = x + p*a + s*w;
+        r1 = s - mat*s*w;
+        if(r1.magnitude() < eps) break;
+        b = (a / w)*(r1*r_)/(r*r_);
+        p1 = r1 + (p - mat*p*w)*b;
+        if (std::abs(r1*r_) < eps ){
+            r_ = r1;
+            p1 = r1;
+        }
+        p = p1;
+        x = x1;
+        r = r1;
+    }
+    std::cout<<count<<"\n";
+    return x1;*/
+}
+
 template <typename type,size_t size>
 matrix<type, size, size> converse_IM(matrix<type, size, size> exemp, double eps)
 {
     matrix<type,size,size> ones('E');
     for(int i = 0;i < size;i++)
-        ones.set_colum(IM(exemp,ones.get_colum(i),eps,ones.get_colum(i)),i);
+        ones.set_colum(simple_iteration(exemp,ones.get_colum(i),eps,ones.get_colum(i)),i);
     return ones;
 }
 

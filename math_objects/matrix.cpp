@@ -195,12 +195,43 @@ operator*(const matrix<lhs,Y,X>& lhs_value,const mvector<rhs,X>& rhs_value)
 template<typename lhs,typename rhs,size_t Y,size_t X,
 typename temp = typename matrix<typename common_type<lhs,rhs>::type,Y,X>::
     template enable_type_combined<lhs,rhs>>
+mvector<typename common_type<lhs,rhs>::type,Y>
+operator*(const mvector<lhs,X>& lhs_value, const matrix<rhs,Y,X>& rhs_value)
+{
+    mvector<typename common_type<rhs,lhs>::type,X> result;
+    typename common_type<lhs,rhs>::type summ;
+    for(int i = 0;i < Y;i++){
+        summ = 0;
+        for(int j = 0;j < X;j++)
+            summ += rhs_value[j][i]*lhs_value[j];
+        result[i] = summ;
+    }
+    return result;
+}
+
+template<typename lhs,typename rhs,size_t Y,size_t X,
+typename temp = typename matrix<typename common_type<lhs,rhs>::type,Y,X>::
+    template enable_type_combined<lhs,rhs>>
 matrix<typename common_type<lhs,rhs>::type,Y,X>
 operator*(const matrix<lhs,Y,X>& lhs_value,const rhs& rhs_value)
 {
     matrix<typename common_type<lhs,rhs>::type,Y,X> result;
+    result = lhs_value;
     for(int i = 0;i < Y*X;i++)
             result.values[i] *= rhs_value;
+    return result;
+}
+
+template<typename lhs,typename rhs,size_t Y,size_t X,
+typename temp = typename matrix<typename common_type<lhs,rhs>::type,Y,X>::
+    template enable_type_combined<lhs,rhs>>
+matrix<typename common_type<lhs,rhs>::type,Y,X>
+operator*(const lhs& lhs_value, const matrix<rhs,Y,X>& rhs_value)
+{
+    matrix<typename common_type<lhs,rhs>::type,Y,X> result;
+    result = rhs_value;
+    for(int i = 0;i < Y*X;i++)
+            result.values[i] *= lhs_value;
     return result;
 }
 

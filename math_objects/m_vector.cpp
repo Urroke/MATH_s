@@ -1,7 +1,11 @@
 #include "m_vector.h"
 
 template <typename Type,size_t _size>
-mvector<Type,_size>::mvector(){}
+mvector<Type,_size>::mvector()
+{
+    for(int i = 0;i < _size;i++)
+        values[i] = 0;
+}
 
 template <typename Type,size_t _size>
 mvector<Type,_size>::~mvector(){}
@@ -85,6 +89,16 @@ operator*(const mvector<lhs,_size>& lhs_value,const rhs& rhs_value)
     return result;
 }
 
+template <typename lhs,typename rhs,size_t _size,typename temp>
+mvector<typename common_type<lhs,rhs>::type,_size>
+operator*(const lhs& lhs_value, const mvector<rhs,_size>& rhs_value)
+{
+    mvector<typename common_type<lhs,rhs>::type,_size> result;
+    for(int i = 0;i < _size;i++)
+        result[i] = rhs_value[i]*lhs_value;
+    return result;
+}
+
 template<typename lhs,typename rhs,size_t _size,typename temp>
 mvector<typename common_type<lhs,rhs>::type,_size>
 operator+(const mvector<lhs,_size>& lhs_value,const mvector<rhs,_size>& rhs_value)
@@ -132,7 +146,7 @@ mvector<Type,_size> mvector<Type,_size>::normalized()
 }
 
 template<typename Type,size_t _size>
-double mvector<Type,_size>::magnitude()
+Type mvector<Type,_size>::magnitude()
 {
     Type result = 0;
     for(int i = 0;i < _size;i++)
@@ -148,6 +162,26 @@ void mvector<Type,_size>::normalize()
     for(int i = 0;i < _size;i++)
         exemp.values[i] /= magnitude();
         *this = exemp;
+}
+
+template<typename Type,size_t _size>
+Type mvector<Type,_size>::max()
+{
+    Type result = values[0];
+    for(int i = 1;i < _size;i++)
+        if(values[i] > result)
+            result = values[i];
+    return result;
+}
+
+template<typename Type,size_t _size>
+Type mvector<Type,_size>::min()
+{
+    Type result = values[0];
+    for(int i = 1;i < _size;i++)
+        if(values[i] < result)
+            result = values[i];
+    return result;
 }
 
 template<typename Type,size_t _size>

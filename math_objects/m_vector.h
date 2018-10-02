@@ -47,8 +47,10 @@ public:
     friend ostream& operator<<(ostream& out,const mvector<T,size>& exemp);
 
     mvector<Type,_size> normalized();
-    double magnitude();
+    Type magnitude();
     void normalize();
+    Type max();
+    Type min();
     size_t size();
 };
 
@@ -60,6 +62,11 @@ template<typename lhs,typename rhs,size_t _size,typename temp = typename
         mvector<typename common_type<lhs,rhs>::type,_size>::template enable_type_combined<lhs,rhs>>
 mvector<typename common_type<lhs,rhs>::type,_size>
 operator*(const mvector<lhs,_size>& lhs_value,const rhs& rhs_value);
+
+template<typename lhs,typename rhs,size_t _size,typename temp = typename
+        mvector<typename common_type<lhs,rhs>::type,_size>::template enable_type_combined<lhs,rhs>>
+mvector<typename common_type<lhs,rhs>::type,_size>
+operator*(const lhs& lhs_value, const mvector<rhs,_size>& rhs_value);
 
 template<typename lhs,typename rhs,size_t _size,typename temp = typename
         mvector<typename common_type<lhs,rhs>::type,_size>::template enable_type_combined<lhs,rhs>>
