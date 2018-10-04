@@ -21,9 +21,13 @@ int C(size_t n,size_t k);
 template <typename input, typename output>
 output newton_kotes(math_function<input, output> func, size_t degree, input lhs, input rhs, size_t n);
 
+template <typename type, size_t n, size_t degree>
+mvector<type, degree + 1> method_of_min_suare(mvector<type, n> x, mvector<type, n> y);
+
 #include "IM.cpp"
 #include "solve_equations.cpp"
 #include "newton_binom.cpp"
 #include "integral.cpp"
+#include "aprox.cpp"
 
 #endif
