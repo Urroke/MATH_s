@@ -73,14 +73,13 @@ mvector<type,size> BiCGStab(matrix<type,size,size> A, mvector<type,size>
     p = r;
     r_ = r;
     do{
-        std::cout<<x<<"\t"<<r_.normalized()*r.normalized()<<"\n";
         alpha = (r_*r)/((A*p)*r_);
         s = r - A*p*alpha;
         w = ((A*s)*s)/((A*s)*(A*s));
         x1 = x + p*alpha + s*w;
-        r1 = s - A*s*w;
-        beta = (alpha*(r1*r_))/(w*(r*r_));
-        p1 = r1 + (p - A*p*w)*beta;
+        r1 = b - A*x1;//r1 = s - A*s*w;
+        beta = (r1*r_)/(r*r_);//beta = (alpha*(r1*r_))/(w*(r*r_));
+        p1 = r1 + p*beta - A*p*w;
         x = x1;
         r = r1;
         p = p1;

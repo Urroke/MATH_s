@@ -92,9 +92,6 @@ public:
 
     matrix<Type,sizeY,sizeX> get_trangle_view();
 
-    template<typename temp = eneble_type_square>
-    matrix<Type,sizeY - 1,sizeX - 1> minor(size_t Y,size_t X);
-
     void transposed();
 
     matrix<Type,sizeY,sizeX> get_transposed();

@@ -10,5 +10,6 @@ int main()
         double rees;
         std::ifstream fin("file.txt");
         fin>>mat>>vec>>app;
-        //res = BiCGStab(mat, vec, 0.000001, app);
+        res = BiCGStab(mat, vec, 0.0001, app);
+        std::cout<<mat*res;
 }
