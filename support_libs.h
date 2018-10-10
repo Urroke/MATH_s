@@ -12,4 +12,5 @@
 #include <ctime>
 #include <cstdlib>
 #include <random>
+#include "error.h"
 #endif // SUPPORT_LIBS_H_INCLUDED

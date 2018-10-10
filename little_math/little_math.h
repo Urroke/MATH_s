@@ -24,10 +24,18 @@ output newton_kotes(math_function<input, output> func, size_t degree, input lhs,
 template <typename type, size_t n, size_t degree>
 mvector<type, degree + 1> method_of_min_suare(mvector<type, n> x, mvector<type, n> y);
 
+template <typename type, size_t size>
+mvector<type, size> method_of_gauss(matrix<type, size, size> x, mvector<type, size> b);
+
+template <typename type, size_t size>
+mvector<size_t, size> sample_of_main_diagonal_elements(matrix<type, size, size> &mat, mvector<type, size> &vec);
+
 #include "IM.cpp"
+#include "AM.cpp"
 #include "solve_equations.cpp"
 #include "newton_binom.cpp"
 #include "integral.cpp"
 #include "aprox.cpp"
+
 
 #endif

@@ -5,17 +5,18 @@
 
 double func(double x)
 {
-    return 4*x*x*x*x - x*x*x + 2*x*x -7*x - 10;
+    return 0.5*x*x*x - 0.2*x*x + x - 2;
 }
 
 int main()
 {
-    std::cout<<"OK";
-
-    mvector<double, 10> x, y;
+   /* mvector<double, 10> x, y;
     for(int i = 0;i < 10;i++){
-        x[i] = i;
-        y[i] = func(i);
+        x[i] = double(i)/5;
+        y[i] = func(x[i]);
     }
-    std::cout<<method_of_min_suare<double, 10, 4>(x, y);*/
+
+    std::cout<<method_of_min_suare<double, 10, 3>(x, y);
+    */
+
 }

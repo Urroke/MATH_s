@@ -5,12 +5,12 @@
 
 double func(double x)
 {
-    return 3*x*x;
+    return x*x*std::log(x);
 }
 
 int main()
 {
     math_function<double, double> a(func);
-    std::cout<<newton_kotes<double,double>(a,3,0,5,1);
+    std::cout<<newton_kotes<double,double>(a,3, 1 ,2.71812 ,10);
     return 0;
 }

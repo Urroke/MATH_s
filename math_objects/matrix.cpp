@@ -1,7 +1,5 @@
 #include "matrix.h"
 
-enum error{negative_index,index_outside_of_array};
-
 template <typename Type,size_t sizeY,size_t sizeX>
 class matrix<Type,sizeY,sizeX>::proxy_variable
 {

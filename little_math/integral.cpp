@@ -3,7 +3,7 @@
 template <typename input, typename output>
 output newton_kotes(math_function<input, output> func, size_t degree, input lhs, input rhs, size_t n)
 {
-    input h = rhs - lhs/n;
+    input h = (rhs - lhs)/n;
     output res = 0;
 
     for(int i = 0;i < n;i++)

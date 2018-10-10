@@ -8,19 +8,12 @@
 
 int main()
 {
-    try{
         matrix<double,3,3> mat;
         mvector<double,3> res,vec,app;
-        std::ifstream fin("file.txt");
+        std::ifstream fin("file1.txt");
         fin>>mat>>vec>>app;
-        res = IM(mat, vec, 0.001, app, "");
+        res = method_of_gauss(mat, vec);
         std::cout<<vec<<mat*res;
-    }
-    catch(int err){
-        if(err == 1)                    /// Это плохо
-            std::cout<<"The sum of diagonal elements is greater than the sum of the remaining";
-        if(err == 2)
-            std::cout<<"Zero on main diagonal";
-    }
+
     return 0;
 }

@@ -3,14 +3,11 @@
 #include "little_math.h"
 
 template <typename type, size_t size>
-mvector<type,size> simple_iteration(matrix<type,size,size> mat, mvector<type,size>
-                        vec, double eps, mvector<type,size> initial_approx, std::string options)
+mvector<size_t, size> sample_of_main_diagonal_elements(matrix<type, size, size> &mat, mvector<type, size> &vec, mvector<size_t, size>& numbers)
 {
-    int* numbers = new int[size];
     for(int i = 0;i < size;i++)
         numbers[i] = i;
     int maxX, maxY;
-
     for(int i = 0;i < size - 1;i++){
         maxX = i, maxY = i;
         for(int j = i;j < size;j++)
@@ -22,23 +19,33 @@ mvector<type,size> simple_iteration(matrix<type,size,size> mat, mvector<type,siz
         swap(numbers[i],numbers[maxX]);
         mat.swap_elements(i,i,maxY,maxX);
     }
-    double diag = 0,other = 0;
+    type diag = 0,other = 0;
     for(int i = 0;i < size;i++){
         diag += mat[i][i];
         for(int j = 0;j < size;j++)
             if(i != j) other += mat[i][j];
     }
 
-    if(diag < other) throw 1;
+    if(diag < other) throw except::no_diagonal_dominance;
     diag = 1;
 
     for(int i = 0;i < size;i++)
         diag *= mat[i][i];
 
-    if(diag == 0) throw 2;
+    if(diag == 0) throw except::zeros_on_the_diagonal;
 
+    return numbers;
+}
+
+template <typename type, size_t size>
+mvector<type,size> simple_iteration(matrix<type,size,size> mat, mvector<type,size>
+                        vec, double eps, mvector<type,size> initial_approx, std::string options)
+{
     mvector<type,size> aprox = initial_approx, result;
     type err;
+
+    mvector<size_t, size> numbers;
+    numbers = sample_of_main_diagonal_elements(mat, vec, numbers);
 
     do{
         for(int i = 0;i < size;i++){
@@ -58,7 +65,6 @@ mvector<type,size> simple_iteration(matrix<type,size,size> mat, mvector<type,siz
     for(int i = 0;i < size;i++)
         result[i] = aprox[numbers[i]];
 
-    delete[] numbers;
     return result;
 }
 
@@ -73,10 +79,11 @@ mvector<type,size> BiCGStab(matrix<type,size,size> A, mvector<type,size>
     p = r;
     r_ = r;
     do{
-        alpha = (r_*r)/((A*p)*r_);
-        s = r - A*p*alpha;
+        std::cout<<x;
+        alpha = (r*r_)/((A*p)*r_);
+        s = r - (A*p)*alpha;
         w = ((A*s)*s)/((A*s)*(A*s));
-        x1 = x + p*alpha + s*w;
+        x1 = x - p*alpha - s*w; ///MAGIC IS HERE !!!!
         r1 = b - A*x1;//r1 = s - A*s*w;
         beta = (r1*r_)/(r*r_);//beta = (alpha*(r1*r_))/(w*(r*r_));
         p1 = r1 + p*beta - A*p*w;
