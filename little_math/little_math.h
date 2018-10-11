@@ -30,6 +30,9 @@ mvector<type, size> method_of_gauss(matrix<type, size, size> x, mvector<type, si
 template <typename type, size_t size>
 mvector<size_t, size> sample_of_main_diagonal_elements(matrix<type, size, size> &mat, mvector<type, size> &vec);
 
+template <typename type, size_t size>
+class polynom;
+
 #include "IM.cpp"
 #include "AM.cpp"
 #include "solve_equations.cpp"
