@@ -93,32 +93,6 @@ mvector<type,size> BiCGStab(matrix<type,size,size> A, mvector<type,size>
     }
     while(r1.magnitude() > eps);
     return x1;
-    /*
-
-    while(true){
-            count++;
-        a = (r*r_)/((mat*p)*r_);
-        s = r - (mat*p)*a;
-        if(s.magnitude() < eps){
-            x1 = x + p*a;
-            break;
-        }
-        w = ((mat*s)*s)/((mat*s)*(mat*s));
-        x1 = x + p*a + s*w;
-        r1 = s - mat*s*w;
-        if(r1.magnitude() < eps) break;
-        b = (a / w)*(r1*r_)/(r*r_);
-        p1 = r1 + (p - mat*p*w)*b;
-        if (std::abs(r1*r_) < eps ){
-            r_ = r1;
-            p1 = r1;
-        }
-        p = p1;
-        x = x1;
-        r = r1;
-    }
-    std::cout<<count<<"\n";
-    return x1;*/
 }
 
 template <typename type,size_t size>
