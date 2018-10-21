@@ -1,5 +1,26 @@
 #include "little_math.h"
 
+template <typename type, size_t size>
+class polynom
+{
+private:
+    mvector<type, size + 1> coefs;
+public:
+    polynom(const mvector<type, size + 1>& exemp)
+    {
+        coefs = exemp;
+    }
+
+    type operator()(const type& x)
+    {
+        type result = 0;
+        for(int i = 0;i <= size;i++)
+            result += std::pow(x, size - i)*coefs[i];
+    }
+
+    ~polynom(){;}
+};
+
 template <typename type, size_t n>
 type summ_power(mvector<type, n> exemp, size_t degree)
 {

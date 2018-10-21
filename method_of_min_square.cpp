@@ -3,20 +3,29 @@
 #include "little_math/little_math.h"
 #include <fstream>
 
-double func(double x)
-{
-    return 0.5*x*x*x - 0.2*x*x + x - 2;
-}
+
 
 int main()
 {
-   /* mvector<double, 10> x, y;
-    for(int i = 0;i < 10;i++){
-        x[i] = double(i)/5;
-        y[i] = func(x[i]);
+    constexpr size_t degree = 1;
+    constexpr size_t degree2 = 7;
+    constexpr size_t length = 8;
+
+    mvector<double, length> x, y;
+    double err1 = 0, err2 = 0;
+
+    std::ifstream fin("data.txt");
+    std::ofstream fout("polynom1.txt");
+
+    fin>>x>>y;
+
+    polynom<double, degree> func1(method_of_min_suare<double, length, degree>(x, y));
+    polynom<double, degree2> func2(method_of_min_suare<double, length, degree2>(x, y));
+
+    for(int i = 0;i < length;i++){
+        err1 += std::pow(func1(x[i]) - y[i], 2);
+        err2 += std::pow(func2(x[i]) - y[i], 2);
     }
 
-    std::cout<<method_of_min_suare<double, 10, 3>(x, y);
-    */
-
+    std::cout<<err1<<"\t"<<err2;
 }
