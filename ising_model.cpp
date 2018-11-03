@@ -30,10 +30,10 @@ double m(const matrix<int, size, size>& exemp)
 
 int main()
 {
-    constexpr size_t size = 32;
-    const size_t N = 1000;
-    constexpr size_t time = 1000;
-    mvector<double, N> magnetization;
+    constexpr size_t size = 8;
+    const size_t N = 10000;
+    constexpr size_t time = 2000;
+
     std::mt19937 gen(std::time(0));
     int quant = (4294967295)/(size*size) + 1;
     size_t point, x, y;
@@ -45,19 +45,23 @@ int main()
 
     int dE;
     matrix<int, size, size> cell;
+    std::ofstream fout("m(t)8.dat"), fout1("e(t)8.dat");
 
     for(int tmp = 0;tmp < 27;tmp++){
         exp[0] = std::exp(-4/temp[tmp]);
         exp[1] = std::exp(-8/temp[tmp]);
-        std::ofstream fout("res/" + std::to_string(temp[tmp]) + " T.dat", std::ios::app);
+        mvector<double, N> magnetization, energy;
+
         for(int n = 0;n < N;n++){
             std::cout<<100*double(tmp*N + n)/(27*N)<<" %";
-            for(int i = 0;i < size;i++)
+
+           for(int i = 0;i < size;i++)
                 for(int j = 0;j < size;j++)
                     cell[i][j] = 1;
 
-            for(int mcss = 1;mcss < time;mcss++){
-                fout<<m(cell)<<"\t";
+            for(int mcss = 1;mcss <= time;mcss++){
+                magnetization[mcss - 1] += m(cell);
+                energy[mcss - 1] += e(cell);
                 for(int i = 0;i < size*size;i++){
                     point = gen()/quant;
                     x = point % size;
@@ -76,8 +80,11 @@ int main()
                     }
                 }
             }
-
             system("cls");
+        }
+        for(int mcss = 1;mcss <= time;mcss++){
+            fout<<mcss<<"\t"<<magnetization[mcss - 1]/N + 1<<"\n";
+            fout1<<mcss<<"\t"<<energy[mcss - 1]/N<<"\n";
         }
     }
 }

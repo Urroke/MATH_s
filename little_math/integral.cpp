@@ -13,3 +13,24 @@ output newton_kotes(math_function<input, output> func, size_t degree, input lhs,
     res /= newton_kotes_table[degree - 1][0];
     return res;
 }
+
+/*template <typename input,typename output>
+output gauss_legendre(output(*func)(input), input a, input b)
+{
+    output res = 0;
+
+    for(int i = 0;i < 6;i++)
+        res += GLQ_weight[i]*func((a + b)/2 + GLQ_points[i]*(b - a)/2);
+    return (b - a)*res/2;
+}*/
+
+template <typename input,typename output>
+output gauss_legendre(std::function<output(input)> func, input a, input b)
+{
+   output res = 0;
+
+    for(int i = 0;i < 6;i++)
+        res += GLQ_weight[i]*func((a + b)/2 + GLQ_points[i]*(b - a)/2);
+    return (b - a)*res/2;
+}
+

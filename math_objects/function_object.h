@@ -34,6 +34,5 @@ public:
 
 };
 
-#include "integral.cpp"
 #include "function_object.cpp"
 #endif
