@@ -30,9 +30,9 @@ double m(const matrix<int, size, size>& exemp)
 
 int main()
 {
-    constexpr size_t size = 8;
-    const size_t N = 10000;
-    constexpr size_t time = 2000;
+    constexpr size_t size = 64;
+    const size_t N = 8000;
+    constexpr size_t time = 8000;
 
     std::mt19937 gen(std::time(0));
     int quant = (4294967295)/(size*size) + 1;
@@ -43,14 +43,16 @@ int main()
         2.15, 2.2, 2.25, 2.3, 2.35, 2.4, 2.45, 2.5,
         2.55, 2.6, 2.65, 2.7, 2.75, 2.8, 3, 3.2, 3.4, 3.6};
 
-    int dE;
+    int dE, saveT;
     matrix<int, size, size> cell;
-    std::ofstream fout("m(t)8.dat"), fout1("e(t)8.dat");
+    std::ofstream fout("m(t)64.dat", std::ios::app), fout1("e(t)64.dat", std::ios::app);
+    std::ifstream fouts("save.dat");
 
-    for(int tmp = 0;tmp < 27;tmp++){
+    fouts>>saveT;
+    for(int tmp = saveT;tmp < 27;tmp++){
         exp[0] = std::exp(-4/temp[tmp]);
         exp[1] = std::exp(-8/temp[tmp]);
-        mvector<double, N> magnetization, energy;
+        mvector<double, time> magnetization, energy;
 
         for(int n = 0;n < N;n++){
             std::cout<<100*double(tmp*N + n)/(27*N)<<" %";
@@ -86,5 +88,7 @@ int main()
             fout<<mcss<<"\t"<<magnetization[mcss - 1]/N + 1<<"\n";
             fout1<<mcss<<"\t"<<energy[mcss - 1]/N<<"\n";
         }
+        std::ofstream fins("save.dat");
+        fins<<tmp + 1;
     }
 }
