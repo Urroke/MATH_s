@@ -49,7 +49,7 @@ mvector<type, degree + 1> method_of_min_suare(mvector<type, n> x, mvector<type, 
         b[i] = summ_power(xy, 1);
     }
 
-    res = method_of_gauss(A, b);
+    res = method_of_gauss(A, b, true);
 
     return res;
 }
