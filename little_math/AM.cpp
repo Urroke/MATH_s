@@ -1,17 +1,21 @@
 #include "little_math.h"
 
 template <typename type, size_t size>
-mvector<type, size> method_of_gauss(matrix<type, size, size> A, mvector<type, size> b)
+mvector<type, size> method_of_gauss(matrix<type, size, size> A, mvector<type, size> b, bool somde)
 {
     mvector<size_t, size> numbers;
     mvector<type, size> x, res;
-    try{
-        numbers = sample_of_main_diagonal_elements(A ,b, numbers);
-    }catch(except val)
-    {
-        if(val != except::no_diagonal_dominance)
-            throw val;
-    }
+    if(somde)
+        try{
+            numbers = sample_of_main_diagonal_elements(A ,b, numbers);
+        }catch(except val)
+        {
+            if(val != except::no_diagonal_dominance)
+                throw val;
+        }
+    else
+        for(int i = 0;i < size;i++)
+            numbers[i] = i;
     type coef;
     for(int i = 0;i < size - 1;i++)
         for(int j = i + 1;j < size;j++){

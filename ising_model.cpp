@@ -30,10 +30,10 @@ double m(const matrix<int, size, size>& exemp)
 
 int main()
 {
-    constexpr size_t size = 64;
-    const size_t N = 8000;
-    constexpr size_t time = 8000;
-
+    constexpr size_t size = 8;
+    const size_t N = 2000;
+    constexpr size_t time = 1000;
+    std::uniform_int_distribution<int> dist(0, 45);
     std::mt19937 gen(std::time(0));
     int quant = (4294967295)/(size*size) + 1;
     size_t point, x, y;
@@ -45,7 +45,7 @@ int main()
 
     int dE, saveT;
     matrix<int, size, size> cell;
-    std::ofstream fout("m(t)64.dat", std::ios::app), fout1("e(t)64.dat", std::ios::app);
+    std::ofstream fout("m(t)8.dat", std::ios::app), fout1("e(t)8.dat", std::ios::app);
     std::ifstream fouts("save.dat");
 
     fouts>>saveT;
@@ -85,7 +85,7 @@ int main()
             system("cls");
         }
         for(int mcss = 1;mcss <= time;mcss++){
-            fout<<mcss<<"\t"<<magnetization[mcss - 1]/N + 1<<"\n";
+            fout<<mcss<<"\t"<<magnetization[mcss - 1]/N<<"\n";
             fout1<<mcss<<"\t"<<energy[mcss - 1]/N<<"\n";
         }
         std::ofstream fins("save.dat");
