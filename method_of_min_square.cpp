@@ -3,8 +3,6 @@
 #include "little_math/little_math.h"
 #include <fstream>
 
-
-
 int main()
 {
     constexpr size_t degree = 1;

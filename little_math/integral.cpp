@@ -1,7 +1,7 @@
 #include "little_math.h"
 
 template <typename input, typename output>
-output newton_kotes(math_function<input, output> func, size_t degree, input lhs, input rhs, size_t n)
+output newton_kotes(output(*func)(input), input lhs, input rhs, size_t degree, size_t n)
 {
     input h = (rhs - lhs)/n;
     output res = 0;
@@ -14,7 +14,7 @@ output newton_kotes(math_function<input, output> func, size_t degree, input lhs,
     return res;
 }
 
-/*template <typename input,typename output>
+template <typename input,typename output>
 output gauss_legendre(output(*func)(input), input a, input b)
 {
     output res = 0;
@@ -22,9 +22,9 @@ output gauss_legendre(output(*func)(input), input a, input b)
     for(int i = 0;i < 6;i++)
         res += GLQ_weight[i]*func((a + b)/2 + GLQ_points[i]*(b - a)/2);
     return (b - a)*res/2;
-}*/
+}
 
-template <typename input,typename output>
+/*template <typename input,typename output>
 output gauss_legendre(std::function<output(input)> func, input a, input b)
 {
    output res = 0;
@@ -32,5 +32,5 @@ output gauss_legendre(std::function<output(input)> func, input a, input b)
     for(int i = 0;i < 6;i++)
         res += GLQ_weight[i]*func((a + b)/2 + GLQ_points[i]*(b - a)/2);
     return (b - a)*res/2;
-}
+}*/
 
