@@ -3,27 +3,42 @@
 #include "little_math/little_math.h"
 #include <fstream>
 
+double log(double x){;}
+
+double exp(double x){;}
+
+template <typename type, size_t size>
+void convertor(const mvector<type, size>& data, type(*func)(type))
+{
+    for(int i = 0;i < size;i++)
+        data[i] = func(data[i]);
+}
+
 int main()
 {
-    constexpr size_t degree = 1;
-    constexpr size_t degree2 = 7;
-    constexpr size_t length = 8;
+    constexpr int L = 1000;
+    constexpr int N = 5;
+    constexpr int polynom_degree = 1;
+    mvector<double, L> data[N], MCS_s;
+    mvector<double, polynom_degree + 1> coefs;
+    mvector<double, N> a, b;
+    double delta;
+    std::ifstream fin("data.dat");
+    std::ofstream result("value.dat");
+    std::ofstream polynoms("polynoms.dat");
 
-    mvector<double, length> x, y;
-    double err1 = 0, err2 = 0;
-
-    std::ifstream fin("data.txt");
-    std::ofstream fout("polynom1.txt");
-
-    fin>>x>>y;
-
-    polynom<double, degree> func1(method_of_min_suare<double, length, degree>(x, y));
-    polynom<double, degree2> func2(method_of_min_suare<double, length, degree2>(x, y));
-
-    for(int i = 0;i < length;i++){
-        err1 += std::pow(func1(x[i]) - y[i], 2);
-        err2 += std::pow(func2(x[i]) - y[i], 2);
+    fin>>MCS_s;
+    for(int i = 0;i < N;i++){
+        fin>>data[i];
+        convertor(data[i], log);
     }
 
-    std::cout<<err1<<"\t"<<err2;
+    for(int i = 0;i < N;i++){
+        coefs = method_of_min_suare<double, 100, polynom_degree>(MCS_s.get_interval<100,200>(),
+                                                                data[i].get_interval<100,200>());
+        a[i] = coefs[0];
+        b[i] = coefs[1];
+    }
+
+    delta = std::sqrt((summ_power(a,2) - summ_power(a,1))/(n*(n-1)));
 }

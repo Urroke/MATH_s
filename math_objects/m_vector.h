@@ -39,6 +39,8 @@ public:
 
     const Type& operator[](const size_t& index) const;
 
+    template <size_t a, size_t b>
+    mvector<Type, b - a> get_interval();
 
     template <typename T,size_t size>
     friend istream& operator>>(istream& in,mvector<T,size>& exemp);
