@@ -142,7 +142,7 @@ template <typename T,size_t size>
 ostream& operator<<(ostream& out,const mvector<T,size>& exemp)
 {
     for(int i = 0;i < size;i++)
-        out<<exemp.values[i]<<" ";
+        out<<exemp.values[i]<<"\n";
     out<<"\n";
     return out;
 }
