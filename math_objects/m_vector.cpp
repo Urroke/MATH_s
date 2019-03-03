@@ -69,6 +69,17 @@ const Type& mvector<Type,_size>::operator[](const size_t& index) const
     else  return this->values[index];
 }
 
+template <typename Type, size_t _size>
+template <size_t a, size_t b>
+mvector<Type, b - a> mvector<Type,_size>::get_interval()
+{
+    if(a >= values.size()||b >= values.size()) throw invalid_argument("Index outside of array");
+    mvector<Type, b - a> res;
+    for(int i = 1;i < b - a;i++)
+        res[i] = values[a + i];
+    return res;
+}
+
 template <typename lhs,typename rhs,size_t _size,typename temp>
 typename common_type<lhs,rhs>::type operator*(const mvector<lhs,_size>& lhs_value,const mvector<rhs,_size>& rhs_value)
 {
@@ -130,7 +141,7 @@ template <typename T,size_t size>
 ostream& operator<<(ostream& out,const mvector<T,size>& exemp)
 {
     for(int i = 0;i < size;i++)
-        out<<exemp.values[i]<<" ";
+        out<<exemp.values[i]<<"\n";
     out<<"\n";
     return out;
 }

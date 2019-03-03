@@ -10,7 +10,7 @@ int main()
 	std::ifstream fin("e(t)64.dat");
 	std::ofstream fout("e(T)_64.dat");
 	mvector<double, length> m[27];
-	
+
 	for(int i = 0;i < 27;i++)
 		for(int j = 0;j < length;j++){
 			fin>>x>>x2;

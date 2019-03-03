@@ -32,7 +32,7 @@ int main()
 {
     constexpr size_t size = 8;
     const size_t N = 2000;
-    constexpr size_t time = 1000;
+    constexpr size_t time = 3000;
     std::uniform_int_distribution<int> dist(0, 45);
     std::mt19937 gen(std::time(0));
     int quant = (4294967295)/(size*size) + 1;
@@ -55,7 +55,7 @@ int main()
         mvector<double, time> magnetization, energy;
 
         for(int n = 0;n < N;n++){
-            std::cout<<100*double(tmp*N + n)/(27*N)<<" %";
+            std::cout<<100*double(tmp*N + n)/(27*N)<<" %\n";
 
            for(int i = 0;i < size;i++)
                 for(int j = 0;j < size;j++)
@@ -82,7 +82,7 @@ int main()
                     }
                 }
             }
-            system("cls");
+            system("clear");
         }
         for(int mcss = 1;mcss <= time;mcss++){
             fout<<mcss<<"\t"<<magnetization[mcss - 1]/N<<"\n";
