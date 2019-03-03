@@ -13,13 +13,15 @@ private:
 
     array<Type,_size> values;
 public:
-    int* a = new int;
     template <typename lhs,typename rhs>
     using enable_type_combined = typename enable_if<combined<lhs,rhs>,void>::type;
 
     mvector();
     ~mvector();
-
+    mvector<Type, _size>& operator=(const std::initializer_list<Type>& exemp){
+        std::copy(exemp.begin(), exemp.end(), values.begin());
+        return *this;
+    }
     template <typename other_type,typename temp = enable_type_combined<Type,other_type>>
     mvector<Type,_size>& operator+=(const mvector<other_type,_size>& exemp);
 
@@ -34,6 +36,8 @@ public:
 
     template <typename other_type,typename temp = enable_type_combined<Type,other_type>>
     mvector<Type,_size>& operator/=(const other_type& exemp);
+
+    //mvector<Type, _size>& operator{}(const std::initializer_list<Type>& exemp);
 
     Type& operator[](const size_t& index);
 

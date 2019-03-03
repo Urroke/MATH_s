@@ -51,22 +51,21 @@ template <typename other_type,typename temp>
 mvector<Type,_size>& mvector<Type,_size>::operator/=(const other_type& exemp)
 {
     if(exemp == 0) throw invalid_argument("error: attempt to divide by 0");
-    Type oper = static_cast<Type>(exemp);
     for(int i = 0;i < _size;i++)
-        this->values[i] /= oper;
+        this->values[i] /= static_cast<Type>(exemp);
 }
 
 template <typename Type,size_t _size>
 Type& mvector<Type,_size>::operator[](const size_t& index)
 {
-    if(index >= values.size()) throw invalid_argument("Index outside of array");
+    if(index >= values.size()) throw "Pisya tyt";
     else return  this->values[index];
 }
 
 template <typename Type,size_t _size>
 const Type& mvector<Type,_size>::operator[](const size_t& index) const
 {
-    if(index >= values.size()) throw invalid_argument("Index outside of array");
+    if(index >= values.size()) throw "Pisya tyt";
     else  return this->values[index];
 }
 

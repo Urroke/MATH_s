@@ -7,17 +7,16 @@
 
 int main()
 {
-    constexpr size_t degree = 1;
-    constexpr size_t degree2 = 7;
-    constexpr size_t length = 8;
+    constexpr int L;
+    constexpr int N;
+    constexpr int polynom_degree;
 
-    mvector<double, length> x, y;
-    double err1 = 0, err2 = 0;
+    mvector<double, L> data[N];
 
-    std::ifstream fin("data.txt");
-    std::ofstream fout("polynom1.txt");
+    std::ifstream fin("data.dat");
+    std::ofstream fout("value.dat");
 
-    fin>>x>>y;
+
 
     polynom<double, degree> func1(method_of_min_suare<double, length, degree>(x, y));
     polynom<double, degree2> func2(method_of_min_suare<double, length, degree2>(x, y));
