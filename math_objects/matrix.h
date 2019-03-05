@@ -1,7 +1,7 @@
 #ifndef MATRIX_H_INCLUDED
 #define MATRIX_H_INCLUDED
 #include "m_vector.h"
-template <typename Type,size_t sizeY,size_t sizeX>
+template <typename Type, size_t sizeY, size_t sizeX>
 class matrix
 {
 private:

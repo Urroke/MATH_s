@@ -6,11 +6,11 @@
 #include <array>
 
 #define N 3
-#define size 16
-#define repeats_struct 30
-#define repeats_for_avarage 15
+#define size 8
+#define repeats_struct 1
+#define repeats_for_avarage 40
 #define await_time 0
-#define observation_time 400
+#define observation_time 500
 
 using matrix = std::array<std::array<std::array<mvector<double, N>, size>, size>, size>;
 
@@ -69,7 +69,7 @@ void init_system(matrix& system, const double& p)
         for(int j = 0;j < size;j++)
             for(int k = 0;k < size;k++)
                 if(uniform_distribution(gen, 0.0, 1.0) < p)
-                    system[i][j][k] = {1, 0, 0};
+                    system[i][j][k] = {0, 0, 1};
 }
 
 double get_m(matrix& system)
@@ -122,7 +122,7 @@ system_data metropolys_algorythm(matrix system, const double& T)
 
 int main()
 {
-    const double p = 0.8;
+    const double p = 1;
     system_data result;
     matrix system;
 
@@ -130,7 +130,7 @@ int main()
         std::cout<<i<<"\n";
         init_system(system, p);
         for(int j = 0;j < repeats_for_avarage;j++){
-            result += metropolys_algorythm(system, 2);
+            result += metropolys_algorythm(system, 1.1);
         }
     }
 

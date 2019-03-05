@@ -7,7 +7,7 @@ mvector<type, size> method_of_gauss(matrix<type, size, size> A, mvector<type, si
     mvector<type, size> x, res;
     if(somde)
         try{
-            numbers = sample_of_main_diagonal_elements(A ,b, numbers);
+            numbers = sample_of_main_diagonal_elements(A ,b);
         }catch(except val)
         {
             if(val != except::no_diagonal_dominance)

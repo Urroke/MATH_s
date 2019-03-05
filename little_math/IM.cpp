@@ -3,8 +3,9 @@
 #include "little_math.h"
 
 template <typename type, size_t size>
-mvector<size_t, size> sample_of_main_diagonal_elements(matrix<type, size, size> &mat, mvector<type, size> &vec, mvector<size_t, size>& numbers)
+mvector<size_t, size> sample_of_main_diagonal_elements(matrix<type, size, size> &mat, mvector<type, size> &vec)
 {
+    mvector<size_t , size> numbers;
     for(int i = 0;i < size;i++)
         numbers[i] = i;
     int maxX, maxY;
@@ -19,7 +20,7 @@ mvector<size_t, size> sample_of_main_diagonal_elements(matrix<type, size, size> 
         swap(numbers[i],numbers[maxX]);
         mat.swap_elements(i,i,maxY,maxX);
     }
-    type diag = 0,other = 0;
+    /*type diag = 0,other = 0;
     for(int i = 0;i < size;i++){
         diag += mat[i][i];
         for(int j = 0;j < size;j++)
@@ -33,7 +34,7 @@ mvector<size_t, size> sample_of_main_diagonal_elements(matrix<type, size, size> 
         diag *= mat[i][i];
 
     if(diag == 0) throw except::zeros_on_the_diagonal;
-
+    */
     return numbers;
 }
 
@@ -69,8 +70,8 @@ mvector<type,size> simple_iteration(matrix<type,size,size> mat, mvector<type,siz
 }
 
 template <typename type, size_t size>
-mvector<type,size> BiCGStab(matrix<type,size,size> A, mvector<type,size>
-                        b, double eps, mvector<type,size> x)
+mvector<type,size> BiCGStab(const matrix<type,size,size>& A,const mvector<type,size>&
+                        b,const double& eps, mvector<type,size> x)
 {
     mvector<type, size> r, r_, p, r1, x1, s, p1;
     type alpha, beta, w;
@@ -79,7 +80,6 @@ mvector<type,size> BiCGStab(matrix<type,size,size> A, mvector<type,size>
     p = r;
     r_ = r;
     do{
-        std::cout<<x;
         alpha = (r*r_)/((A*p)*r_);
         s = r - (A*p)*alpha;
         w = ((A*s)*s)/((A*s)*(A*s));

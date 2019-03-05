@@ -10,8 +10,8 @@ mvector<type,size> simple_iteration(matrix<type,size,size> mat, mvector<type,siz
                         vec, double eps, mvector<type,size> initial_approx, std::string options);
 
 template <typename type, size_t size>
-mvector<type,size> BiCGStab(matrix<type,size,size> A, mvector<type,size>
-                        b, double eps, mvector<type,size> x);
+mvector<type,size> BiCGStab(const matrix<type,size,size>& A, const mvector<type,size>&
+                        b, const double& eps, mvector<type,size> x);
 
 template <typename type,size_t size>
 matrix<type, size, size> converse_IM(matrix<type, size, size> exemp, double eps);
