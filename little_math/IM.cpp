@@ -83,7 +83,7 @@ mvector<type,size> BiCGStab(const matrix<type,size,size>& A,const mvector<type,s
         alpha = (r*r_)/((A*p)*r_);
         s = r - (A*p)*alpha;
         w = ((A*s)*s)/((A*s)*(A*s));
-        x1 = x - p*alpha - s*w; ///MAGIC IS HERE !!!!
+        x1 = x + p*alpha + s*w; ///MAGIC IS HERE !!!!
         r1 = b - A*x1;//r1 = s - A*s*w;
         beta = (r1*r_)/(r*r_);//beta = (alpha*(r1*r_))/(w*(r*r_));
         p1 = r1 + p*beta - A*p*w;

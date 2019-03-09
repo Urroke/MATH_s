@@ -44,6 +44,7 @@ mvector<Type,_size>& mvector<Type,_size>::operator*=(const other_type& exemp)
     Type oper = static_cast<Type>(exemp);
     for(int i = 0;i < _size;i++)
         this->values[i] *= oper;
+    return *this;
 }
 
 template <typename Type,size_t _size>
@@ -53,6 +54,7 @@ mvector<Type,_size>& mvector<Type,_size>::operator/=(const other_type& exemp)
     if(exemp == 0) throw invalid_argument("error: attempt to divide by 0");
     for(int i = 0;i < _size;i++)
         this->values[i] /= static_cast<Type>(exemp);
+    return *this;
 }
 
 template <typename Type,size_t _size>
@@ -125,7 +127,7 @@ operator-(const mvector<lhs,_size>& lhs_value,const mvector<rhs,_size>& rhs_valu
 {
     mvector<typename common_type<lhs,rhs>::type,_size> exemp;
     for(int i = 0;i < _size;i++)
-        exemp[i] = rhs_value[i] - lhs_value[i];
+        exemp[i] = lhs_value[i] - rhs_value[i];
     return exemp;
 }
 
@@ -149,10 +151,7 @@ ostream& operator<<(ostream& out,const mvector<T,size>& exemp)
 template<typename Type,size_t _size>
 mvector<Type,_size> mvector<Type,_size>::normalized()
 {
-    mvector<Type,_size> exemp = *this;
-    for(int i = 0;i < _size;i++)
-        exemp.values[i] /= magnitude();
-    return exemp;
+    return *this /= magnitude();
 }
 
 template<typename Type,size_t _size>
@@ -160,9 +159,8 @@ Type mvector<Type,_size>::magnitude()
 {
     Type result = 0;
     for(int i = 0;i < _size;i++)
-        result += pow(values[i],2);
-    result = sqrt(result);
-    return result;
+        result += values[i]*values[i];
+    return std::sqrt(result);
 }
 
 template<typename Type,size_t _size>
