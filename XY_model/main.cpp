@@ -4,18 +4,18 @@
 #include <ctime>
 #include <fstream>
 #include <array>
-#include <mpi/mpi.h>
+#include <mpi.h>
 #include <chrono>
 
 #define N 3
-#define size 24
+#define size 32
 #define repeats_struct 1
-#define repeats_for_avarage 100
-#define await_time 1000
-#define observation_time 1000
-#define T1 0.5
-#define T2 2.1
-#define T_steps 15
+#define repeats_for_avarage 50
+#define await_time 200
+#define observation_time 200
+#define T1 1.05
+#define T2 1.65
+#define T_steps 30
 
 using matrix = std::array<std::array<std::array<mvector<double, N>, size>, size>, size>;
 std::mt19937 gen(std::time(nullptr));
@@ -143,7 +143,7 @@ int main(int argc, char* argv[])
         for(int j = 0;j < repeats_for_avarage;j++){
             std::cout<<j<<"@@@@@@@@@@@@@!\n";
             init_system(system, p);
-            metropolys_algorythm(system, T2, 1000, 0);
+            //metropolys_algorythm(system, T2, 20, 0);
             for(int T = T_steps;T >= 0;T--){
                 std::cout<<T<<"\n";
                 //std::cout<<double((T_steps - T) + j*(T_steps - T))/(T_steps*repeats_for_avarage)<<"\n";

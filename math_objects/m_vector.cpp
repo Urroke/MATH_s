@@ -103,6 +103,16 @@ operator*(const mvector<lhs,_size>& lhs_value,const rhs& rhs_value)
 
 template <typename lhs,typename rhs,size_t _size,typename temp>
 mvector<typename common_type<lhs,rhs>::type,_size>
+operator/(const mvector<lhs,_size>& lhs_value,const rhs& rhs_value)
+{
+    mvector<typename common_type<lhs,rhs>::type,_size> result;
+    for(int i = 0;i < _size;i++)
+        result[i] = lhs_value[i]/rhs_value;
+    return result;
+}
+
+template <typename lhs,typename rhs,size_t _size,typename temp>
+mvector<typename common_type<lhs,rhs>::type,_size>
 operator*(const lhs& lhs_value, const mvector<rhs,_size>& rhs_value)
 {
     mvector<typename common_type<lhs,rhs>::type,_size> result;
