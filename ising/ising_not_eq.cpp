@@ -8,10 +8,10 @@
 #include "../math_objects/m_vector.h"
 
 #define calc_code 3
-#define L 64
-#define config 1000
+#define L 256
+#define config 100
 #define await 0
-#define observation 500
+#define observation 1000
 #define temps 1
 #define T1 2.5
 #define T2 2.5

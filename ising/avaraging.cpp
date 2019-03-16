@@ -5,9 +5,9 @@ int main()
 {
     constexpr size_t N = 4;
     constexpr size_t temps = 1;
-    constexpr size_t size = 500;
-    constexpr size_t config = 1000;
-    constexpr size_t L = 64;
+    constexpr size_t size = 1000;
+    constexpr size_t config = 100;
+    constexpr size_t L = 256;
     constexpr double T1 = 2.5;
     constexpr double T2 = 2.5;
 

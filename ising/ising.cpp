@@ -9,14 +9,14 @@
 #include <cstdlib>
 
 #define calc_code 3
-#define L 128
-#define config 250
-#define await 100
-#define init_await 100
-#define observation 100
-#define temps 10
-#define T1 2.0
-#define T2 2.5
+#define L
+#define config
+#define await
+#define init_await
+#define observation
+#define temps 50
+#define T1 1.8
+#define T2 2.8
 
 using spin = int;
 
@@ -142,6 +142,7 @@ int main(int argc, char* argv[])
         metropolys_algorythm(system, T1, init_await, 0);
         std::cout<<"config - "<<i<<"\n";
         for(int T = temps;T >= 0;T--){
+        std::cout<<T<<"\n";
             //result = metropolys_algorythm(system, T1 + T*(T2 - T1)/temps, await, observation);
             result = wolff_algorythm(system, T1 + T*(T2 - T1)/temps, await, observation);
             std::ofstream fout("res/" + std::to_string(calc_code) + "res_"+ std::to_string(L) + "_" + std::to_string(T)+ "_" + std::to_string(i) + "_" + std::to_string(rank) + ".dat");
