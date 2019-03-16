@@ -61,12 +61,13 @@ double get_m(spin (&system)[L][L])
 system_data wolff_algorythm(spin (&system)[L][L], const double& T,const size_t& await_t, const size_t& obser_t)
 {
     system_data res;
-    double chance = 1 - std::exp(-2.0/T);
+    double chance = std::exp(-2.0/T) - 1;
     bool chosen[L][L];
-    size_t x, y;
+    size_t x, y, x_, y_;
     int sign;
+    std::vector<spin> klaster_x, klaster_y;
     static size_t turns = 10;
-    std::function<void(int, int)> expansion = [&](int x_, int y_)-> void{
+    /*std::function<void(int, int)> expansion = [&](int x_, int y_)-> void{
         if(!chosen[x_][y_]){
             chosen[x_][y_] = true;
             if(uniform_distribution(0.0 ,1.0) < chance*system[(x_ + 1)%L][y_]*system[x_][y_])
@@ -79,17 +80,59 @@ system_data wolff_algorythm(spin (&system)[L][L], const double& T,const size_t& 
                 expansion(x_, (y_ - 1 + L)%L);
             system[x_][y_] = sign;
         }
-    };
+    };*/
 
     for(int t = 0;t < await_t + obser_t;t++){
         for(int i = 0;i < turns;i++){
             x = gen()/quant;
             y = gen()/quant;
+            klaster_x.resize(1);
+            klaster_y.resize(1);
+            klaster_x[0] = x;
+            klaster_y[0] = y;
             for(int k = 0;k < L;k++)
                 for(int j = 0;j < L;j++)
                     chosen[k][j] = false;
+            chosen[x][y] = true;
             sign = dist(gen)*2 - 1;
-            expansion(x, y);
+            for(int j = 0;j < klaster_x.size();j++){
+                if(!chosen[(klaster_x[j] + 1)%L][klaster_y[j]])
+                if(uniform_distribution(0.0 ,1.0) < chance*system[(klaster_x[j] + 1)%L][klaster_y[j]]*system[klaster_x[j]][klaster_y[j]]){
+                    x_ = (klaster_x[j] + 1)%L;
+                    y_ = klaster_y[j];
+                    chosen[x_][y_] = true;
+                    system[x_][y_] = sign;
+                    klaster_x.push_back(x_);
+                    klaster_y.push_back(y_);
+                }
+               if(!chosen[(klaster_x[j] + L - 1)%L][klaster_y[j]])
+                if(uniform_distribution(0.0 ,1.0) < chance*system[(klaster_x[j] + L - 1)%L][klaster_y[j]]*system[klaster_x[j]][klaster_y[j]]){
+                    x_ = (klaster_x[j] + L - 1)%L;
+                    y_ = klaster_y[j];
+                    chosen[x_][y_] = true;
+                    system[x_][y_] = sign;
+                    klaster_x.push_back(x_);
+                    klaster_y.push_back(y_);
+                }
+                if(!chosen[klaster_x[j]][(klaster_y[j] + 1)%L])
+                if(uniform_distribution(0.0 ,1.0) < chance*system[klaster_x[j]][(klaster_y[j] + 1)%L]*system[klaster_x[j]][klaster_y[j]]){
+                    x_ = klaster_x[j];
+                    y_ = (klaster_y[j] + 1)%L;
+                    chosen[x_][y_] = true;
+                    system[x_][y_] = sign;
+                    klaster_x.push_back(x_);
+                    klaster_y.push_back(y_);
+                }
+                if(!chosen[klaster_x[j]][(klaster_y[j] + L - 1)%L])
+                if(uniform_distribution(0.0 ,1.0) < chance*system[klaster_x[j]][(klaster_y[j] + L - 1)%L]*system[klaster_x[j]][klaster_y[j]]){
+                    x_ = klaster_x[j];
+                    y_ = (klaster_y[j] + L - 1)%L;
+                    chosen[x_][y_] = true;
+                    system[x_][y_] = sign;
+                    klaster_x.push_back(x_);
+                    klaster_y.push_back(y_);
+                }
+            }
         }
         if(t >= await_t)
             res.add_values(get_m(system), 0);

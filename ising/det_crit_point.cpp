@@ -3,13 +3,13 @@
 
 int main()
 {
-    constexpr size_t N = 4;
+    constexpr size_t N = 3;
     constexpr size_t temps = 10;
-    constexpr size_t size = 100;
-    constexpr size_t config = 250;
+    constexpr size_t size = 200;
+    constexpr size_t config = 50;
     constexpr size_t L = 64;
-    constexpr double T1 = 2.0;
-    constexpr double T2 = 2.5;
+    constexpr double T1 = 1.8;
+    constexpr double T2 = 2.8;
 
     double m_4, m_2, m, r;
     std::ofstream fout("0Aresults_" + std::to_string(L) + ".dat");
