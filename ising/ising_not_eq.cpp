@@ -6,16 +6,14 @@
 #include <fstream>
 #include <iomanip>
 #include "../math_objects/m_vector.h"
-#include <cstdlib>
 
 #define calc_code 3
-#define L 128
-#define config 250
-#define await 100
-#define init_await 100
-#define observation 100
-#define temps 10
-#define T1 2.0
+#define L 64
+#define config 1000
+#define await 0
+#define observation 500
+#define temps 1
+#define T1 2.5
 #define T2 2.5
 
 using spin = int;
@@ -63,24 +61,22 @@ system_data wolff_algorythm(spin (&system)[L][L], const double& T,const size_t& 
     system_data res;
     double chance = 1 - std::exp(-2.0/T);
     bool chosen[L][L];
-    size_t x, y;
-    int sign;
     static size_t turns = 10;
-    std::function<void(int, int)> expansion = [&](int x_, int y_)-> void{
+    std::function<void(int, int, int)> expansion = [&](int x_, int y_, int sign)-> void{
         if(!chosen[x_][y_]){
             chosen[x_][y_] = true;
             if(uniform_distribution(0.0 ,1.0) < chance*system[(x_ + 1)%L][y_]*system[x_][y_])
-                expansion((x_ + 1)%L, y_);
+                expansion((x_ + 1)%L, y_, sign);
             if(uniform_distribution(0.0 ,1.0) < chance*system[(x_ - 1 + L)%L][y_]*system[x_][y_])
-                expansion((x_ - 1 + L)%L, y_);
+                expansion((x_ - 1 + L)%L, y_, sign);
             if(uniform_distribution(0.0 ,1.0) < chance*system[x_][(y_ + 1)%L]*system[x_][y_])
-                expansion(x_, (y_ + 1)%L);
+                expansion(x_, (y_ + 1)%L, sign);
             if(uniform_distribution(0.0 ,1.0) < chance*system[x_][(y_ - 1 + L)%L]*system[x_][y_])
-                expansion(x_, (y_ - 1 + L)%L);
+                expansion(x_, (y_ - 1 + L)%L, sign);
             system[x_][y_] = sign;
         }
     };
-
+    size_t x, y;
     for(int t = 0;t < await_t + obser_t;t++){
         for(int i = 0;i < turns;i++){
             x = gen()/quant;
@@ -88,8 +84,7 @@ system_data wolff_algorythm(spin (&system)[L][L], const double& T,const size_t& 
             for(int k = 0;k < L;k++)
                 for(int j = 0;j < L;j++)
                     chosen[k][j] = false;
-            sign = dist(gen)*2 - 1;
-            expansion(x, y);
+            expansion(x, y, dist(gen)*2 - 1);
         }
         if(t >= await_t)
             res.add_values(get_m(system), 0);
@@ -131,29 +126,20 @@ int main(int argc, char* argv[])
     spin system[L][L];
     MPI_Comm_rank(MPI_COMM_WORLD, &rank);
     MPI_Comm_size(MPI_COMM_WORLD, &size);
-    std::ofstream time_data(std::to_string(calc_code) + "res_size = "+ std::to_string(L) + "_init_await = "
-    + std::to_string(init_await)+ "_await = "
-    + std::to_string(await)+ "_obserwation = "
-    + std::to_string(observation) + "_temps = "
-    + std::to_string(temps) + ".dat");
+    auto start = std::chrono::system_clock::now();
     for(int i = 0;i < config;i++){
-        auto start = std::chrono::system_clock::now();
-        init_system(system);
-        metropolys_algorythm(system, T1, init_await, 0);
         std::cout<<"config - "<<i<<"\n";
         for(int T = temps;T >= 0;T--){
-            //result = metropolys_algorythm(system, T1 + T*(T2 - T1)/temps, await, observation);
+            init_system(system);
             result = wolff_algorythm(system, T1 + T*(T2 - T1)/temps, await, observation);
-            std::ofstream fout("res/" + std::to_string(calc_code) + "res_"+ std::to_string(L) + "_" + std::to_string(T)+ "_" + std::to_string(i) + "_" + std::to_string(rank) + ".dat");
+            std::ofstream fout("m/" + std::to_string(calc_code) + "res_"+ std::to_string(L) + "_" + std::to_string(T)+ "_" + std::to_string(i) + "_" + std::to_string(rank) + ".dat");
             for(int j = 0;j < observation;j++)
                 fout<<setprecision(15)<<result.m[j]<<"\n";
             fout.close();
         }
-        auto end = std::chrono::system_clock::now();
-        std::chrono::duration<double> elapsed_seconds = end-start;
-        std::cout<< elapsed_seconds.count()<< "s\n";
-        time_data<<elapsed_seconds.count()<<"\n";
     }
-
+    auto end = std::chrono::system_clock::now();
+    std::chrono::duration<double> elapsed_seconds = end-start;
+    std::cout<< elapsed_seconds.count() << "s\n";
     MPI_Finalize();
 }
