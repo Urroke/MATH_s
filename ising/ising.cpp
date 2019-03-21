@@ -9,11 +9,11 @@
 #include <cstdlib>
 
 #define calc_code 3
-#define L
-#define config
-#define await
-#define init_await
-#define observation
+#define L 256
+#define config 5
+#define await 500
+#define init_await 500
+#define observation 500
 #define temps 50
 #define T1 1.8
 #define T2 2.8

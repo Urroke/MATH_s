@@ -6,50 +6,32 @@
 #include <array>
 #include <mpi.h>
 #include <chrono>
+#include <iomanip>
 
 #define N 3
-#define size 32
+#define size 48
 #define repeats_struct 1
-#define repeats_for_avarage 50
-#define await_time 200
+#define config 33
+#define await_time 0
 #define observation_time 200
-#define T1 1.05
-#define T2 1.65
-#define T_steps 30
+#define T1 2.0
+#define T2 2.0
+#define temps 1
 
-using matrix = std::array<std::array<std::array<mvector<double, N>, size>, size>, size>;
+using matrix = mvector<double, 3>[size][size][size];
 std::mt19937 gen(std::time(nullptr));
 constexpr auto max_val = double(gen.max());
 int quant = (gen.max())/(size) + 1;
 
 struct system_data
 {
-    mvector<double, observation_time + 1> m;
-    mvector<double, observation_time + 1> c;
+    double m[observation_time];
     size_t repeats = 0, iter = 0;
 
     void add_values(const double& m1, const double& c1)
     {
         m[iter] = m1;
-        c[iter] = c1;
         iter++;
-    }
-
-    system_data& operator+=(const system_data& exemp)
-    {
-        for(int i = 0;i < observation_time;i++)
-            m[i] += exemp.m[i];
-        c += exemp.c;
-        repeats ++;
-        return *this;
-    }
-
-    system_data avarege()
-    {
-        for(int i = 0;i < observation_time;i++)
-            m[i] /= repeats;
-        c /= repeats;
-        return *this;
     }
 };
 
@@ -137,24 +119,21 @@ int main(int argc, char* argv[])
 
     const double p = 1;
     matrix system, system_c;
-    system_data data[T_steps + 1];
+    system_data result;
     auto start = std::chrono::system_clock::now();
     for(int i = 0;i < repeats_struct;i++)
-        for(int j = 0;j < repeats_for_avarage;j++){
-            std::cout<<j<<"@@@@@@@@@@@@@!\n";
-            init_system(system, p);
-            //metropolys_algorythm(system, T2, 20, 0);
-            for(int T = T_steps;T >= 0;T--){
+        for(int j = 0;j < config;j++){
+            std::cout<<"configur - "<<j<<"\n";
+            for(int T = temps - 1;T >= 0;T--){
+                init_system(system, p);
                 std::cout<<T<<"\n";
-                //std::cout<<double((T_steps - T) + j*(T_steps - T))/(T_steps*repeats_for_avarage)<<"\n";
-                    data[T] += metropolys_algorythm(system, T1 + T*(T2 - T1)/T_steps, await_time, observation_time);
+                result = metropolys_algorythm(system, T1 + T*(T2 - T1)/temps, await_time, observation_time);
+                std::ofstream fout("m/res_"+ std::to_string(size) + "_" + std::to_string(T)+ "_" + std::to_string(config*i + j) + "_" + std::to_string(rank) + ".dat");
+                for(int j = 0;j < observation_time;j++)
+                    fout<<setprecision(15)<<result.m[j]<<"\n";
+                fout.close();
             }
         }
-    for(int T = T_steps;T >= 0;T--){
-        data[T].avarege();
-        std::ofstream fout(std::to_string(size) + "n/gaiz_"+ std::to_string(T)+ std::to_string(rank) + ".dat");
-        fout<<data[T].m<<endl;
-    }
     auto end = std::chrono::system_clock::now();
     std::chrono::duration<double> elapsed_seconds = end-start;
     std::cout<< elapsed_seconds.count() << "s\n";
