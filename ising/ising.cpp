@@ -9,7 +9,7 @@
 #include <cstdlib>
 
 #define calc_code 3
-#define L 256
+#define L 128
 #define config 5
 #define await 500
 #define init_await 500
@@ -169,34 +169,35 @@ system_data metropolys_algorythm(spin (&system)[L][L], const double& T,const siz
 int main(int argc, char* argv[])
 {
     int rank, size;
+    std::string machine = ("ryzen 3 1200");
     MPI_Init(&argc, &argv);
     system_data result;
+    double middle_calc_time = 0;
+    double iter = temps*config;
     spin system[L][L];
     MPI_Comm_rank(MPI_COMM_WORLD, &rank);
     MPI_Comm_size(MPI_COMM_WORLD, &size);
-    std::ofstream time_data(std::to_string(calc_code) + "res_size = "+ std::to_string(L) + "_init_await = "
-    + std::to_string(init_await)+ "_await = "
-    + std::to_string(await)+ "_obserwation = "
-    + std::to_string(observation) + "_temps = "
-    + std::to_string(temps) + ".dat");
     for(int i = 0;i < config;i++){
-        auto start = std::chrono::system_clock::now();
         init_system(system);
         metropolys_algorythm(system, T1, init_await, 0);
         std::cout<<"config - "<<i<<"\n";
         for(int T = temps;T >= 0;T--){
-        std::cout<<T<<"\n";
-            //result = metropolys_algorythm(system, T1 + T*(T2 - T1)/temps, await, observation);
+            auto start = std::chrono::system_clock::now();
             result = wolff_algorythm(system, T1 + T*(T2 - T1)/temps, await, observation);
-            std::ofstream fout("res/" + std::to_string(calc_code) + "res_"+ std::to_string(L) + "_" + std::to_string(T)+ "_" + std::to_string(i) + "_" + std::to_string(rank) + ".dat");
+            std::ofstream fout("res/" + std::to_string(std::time(nullptr))+ "_" + machine + "res_"+ std::to_string(L) + "_" + std::to_string(T)+ "_" + std::to_string(i) + "_" + std::to_string(rank) + ".dat");
             for(int j = 0;j < observation;j++)
                 fout<<setprecision(15)<<result.m[j]<<"\n";
             fout.close();
+            auto end = std::chrono::system_clock::now();
+            std::chrono::duration<double> elapsed_seconds = end-start;
+            fout<<elapsed_seconds.count()<<"\n";
+            if(T != temps||i != 0){
+                middle_calc_time *= (temps - T + i*temps);
+                middle_calc_time += elapsed_seconds.count();
+                middle_calc_time /= (temps - T + i*temps + 1);
+            } else middle_calc_time = elapsed_seconds.count();
         }
-        auto end = std::chrono::system_clock::now();
-        std::chrono::duration<double> elapsed_seconds = end-start;
-        std::cout<< elapsed_seconds.count()<< "s\n";
-        time_data<<elapsed_seconds.count()<<"\n";
+        std::cout<<(iter - (i + 1)*temps)*middle_calc_time<<"\n";
     }
 
     MPI_Finalize();
