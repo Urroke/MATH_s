@@ -8,15 +8,14 @@
 #include "../math_objects/m_vector.h"
 #include <cstdlib>
 
-#define calc_code 3
 #define L 128
-#define config 5
-#define await 500
-#define init_await 500
-#define observation 500
-#define temps 50
-#define T1 1.8
-#define T2 2.8
+#define config 25
+#define await 10000
+#define init_await 100
+#define observation 10000
+#define temps 20
+#define T1 2.268
+#define T2 2.2692
 
 using spin = int;
 
