@@ -9,16 +9,16 @@
 #include <iomanip>
 
 #define N 3
-#define size 48
-#define repeats_struct 1
-#define config 33
-#define await_time 0
-#define observation_time 200
-#define T1 2.0
-#define T2 2.0
-#define temps 1
-
-using matrix = mvector<double, 3>[size][size][size];
+#define size 24
+constexpr int repeats_struct = 25;
+constexpr int config = 10;
+constexpr int await_time = 2000;
+constexpr int observation_time = 4000;
+constexpr double T1 = 1.0;
+constexpr double T2 = 1.4;
+constexpr int temps = 20;
+constexpr double eps = 0.0001;
+constexpr double density = 0.8;
 std::mt19937 gen(std::time(nullptr));
 constexpr auto max_val = double(gen.max());
 int quant = (gen.max())/(size) + 1;
@@ -35,7 +35,7 @@ struct system_data
     }
 };
 
-double uniform_distribution(const double& a, const double& b)
+ inline double uniform_distribution(const double& a, const double& b)
 {
     return (b - a)*gen()/max_val + a;
 }
@@ -49,37 +49,43 @@ mvector<double, N> random_normal()
     return res.normalized();
 }
 
-void init_system(matrix& system, const double& p)
+void init_system(mvector<double, N> (&system)[size][size][size], double& p, bool (&not_zero)[size][size][size])
 {
-    double x, y, z;
-    for(int i = 0;i < size;i++)
-        for(int j = 0;j < size;j++)
-            for(int k = 0;k < size;k++)
-                if(uniform_distribution(0.0, 1.0) < p){
-                    system[i][j][k] = {0, 0, 1};
-                    system[i][j][k].not_zero = true;
-                } else {
-                    system[i][j][k] = {0, 0, 0};
-                    system[i][j][k].not_zero = false;
-                }
+    double count;
+    do{
+        count = 0;
+        for(int i = 0;i < size;i++)
+            for(int j = 0;j < size;j++)
+                for(int k = 0;k < size;k++)
+                    if(uniform_distribution(0.0, 1.0) < density){
+                        system[i][j][k] = {0, 0, 1};
+                        not_zero[i][j][k] = true;
+                        count++;
+                    } else {
+                        system[i][j][k] = {0, 0, 0};
+                        not_zero[i][j][k] = false;
+                    }
+    }while(std::fabs(count/(size*size*size) - density) > eps);
+    p = count/(size*size*size);
 }
 
-double get_m(matrix& system)
+double get_m(mvector<double, N> (&system)[size][size][size], const double& p)
 {
     mvector<double, N> res;
     for(int i = 0;i < size;i++)
         for(int j = 0;j < size;j++)
             for(int k = 0;k < size;k++)
                 res += system[i][j][k];
-    return res.magnitude()/(size*size*size);
+    return res.magnitude()/p;
 }
 
-double get_c(const matrix& system)
+double get_c(mvector<double, N> (&system)[size][size][size])
 {
     return 0;
 }
 
-system_data metropolys_algorythm(matrix& system, const double& T,const size_t& await_t, const size_t& obser_t)
+system_data metropolys_algorythm(mvector<double, N> (&system)[size][size][size],
+const double& T,const size_t& await_t, const size_t& obser_t, const double& p, bool (&not_zero)[size][size][size])
 {
     system_data data;
     mvector<double, N> old_state;
@@ -90,10 +96,10 @@ system_data metropolys_algorythm(matrix& system, const double& T,const size_t& a
             x = gen()/quant;
             y = gen()/quant;
             z = gen()/quant;
-            if(true){
+            if(not_zero[x][y][z]){
                 old_state = system[x][y][z];
                 system[x][y][z] = random_normal();
-                dE = -1*(system[x][y][z] - old_state)*(system[(x + 1)%size][y][z]+
+                dE = (old_state - system[x][y][z])*(system[(x + 1)%size][y][z]+
                     system[(x - 1)%size][y][z]+system[x][(y + 1)%size][z]+
                     system[x][(y - 1)%size][z]+system[x][y][(z + 1)%size]+
                     system[x][y][(z - 1)%size]);
@@ -105,7 +111,7 @@ system_data metropolys_algorythm(matrix& system, const double& T,const size_t& a
             }
         }
         if(t >= await_t)
-            data.add_values(get_m(system), get_c(system));
+            data.add_values(get_m(system, p), get_c(system));
     }
     return data;
 }
@@ -116,24 +122,35 @@ int main(int argc, char* argv[])
     MPI_Init(&argc, &argv);
     MPI_Comm_rank(MPI_COMM_WORLD, &rank);
     MPI_Comm_size(MPI_COMM_WORLD, &size_syst);
-
-    const double p = 1;
-    matrix system, system_c;
+    double p;
+    bool not_zero[size][size][size];
+    mvector<double, N> model[size][size][size], model_c[size][size][size];
     system_data result;
     auto start = std::chrono::system_clock::now();
-    for(int i = 0;i < repeats_struct;i++)
+    for(int i = 0;i < repeats_struct;i++){
+        init_system(model_c, p, not_zero);
         for(int j = 0;j < config;j++){
+            for(int a = 0;a < size;a++)
+                for(int aa = 0;aa < size;aa++)
+                    for(int aaa = 0;aaa < size;aaa++)
+                        model[a][aa][aaa] = model_c[a][aa][aaa];
             std::cout<<"configur - "<<j<<"\n";
             for(int T = temps - 1;T >= 0;T--){
-                init_system(system, p);
                 std::cout<<T<<"\n";
-                result = metropolys_algorythm(system, T1 + T*(T2 - T1)/temps, await_time, observation_time);
-                std::ofstream fout("m/res_"+ std::to_string(size) + "_" + std::to_string(T)+ "_" + std::to_string(config*i + j) + "_" + std::to_string(rank) + ".dat");
-                for(int j = 0;j < observation_time;j++)
-                    fout<<setprecision(15)<<result.m[j]<<"\n";
+                result = metropolys_algorythm(model, T1 + T*(T2 - T1)/temps, await_time, observation_time, p, not_zero);
+                std::ofstream fout("results0/res_"+ std::to_string(size) + "_" + std::to_string(T1 + T*(T2 - T1)/temps) + "_" + std::to_string(rank) + ".dat", std::ios_base::app);
+                double m = 0, m_2 = 0, m_4 = 0, val;
+                for(int j = 0;j < observation_time;j++){
+                    val = result.m[j];
+                    m += val;
+                    m_2 += val*val;
+                    m_4 += val*val*val*val;
+                }
+                fout<<setprecision(15)<<m<<"\t"<<m_2<<"\t"<<m_4<<"\n";
                 fout.close();
             }
         }
+    }
     auto end = std::chrono::system_clock::now();
     std::chrono::duration<double> elapsed_seconds = end-start;
     std::cout<< elapsed_seconds.count() << "s\n";

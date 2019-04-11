@@ -15,7 +15,6 @@ private:
 public:
     template <typename lhs,typename rhs>
     using enable_type_combined = typename enable_if<combined<lhs,rhs>,void>::type;
-    bool not_zero = false;
     mvector();
     mvector(std::initializer_list<Type> exemp){
         std::copy(exemp.begin(), exemp.end(), values.begin());
