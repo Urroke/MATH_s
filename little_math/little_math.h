@@ -39,6 +39,7 @@ class polynom;
 #include "newton_binom.cpp"
 #include "integral.cpp"
 #include "aprox.cpp"
+#include "derivative.cpp"
 
 
 #endif
