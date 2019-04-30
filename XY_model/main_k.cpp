@@ -10,13 +10,13 @@
 
 #define N 3
 #define size 16
-constexpr int repeats_struct = 1;
+constexpr int repeats_struct = 5;
 constexpr int config = 10;
-constexpr int await_time = 1000;
-constexpr int observation_time = 2000;
-constexpr double T1 = 1.06;
-constexpr double T2 = 1.1;
-constexpr int temps = 8;
+constexpr int await_time = 100;
+constexpr int observation_time = 4000;
+constexpr double T1 = 1.0;
+constexpr double T2 = 1.3;
+constexpr int temps = 15;
 constexpr double eps = 0.0001;
 constexpr double density = 0.8;
 std::mt19937 gen(std::time(nullptr));
@@ -84,6 +84,61 @@ double get_c(mvector<double, N> (&system)[size][size][size])
     return 0;
 }
 
+system_data svendsen_wang(mvector<double, N> (&system)[size][size][size],
+const double& T,const size_t& await_t, const size_t& obser_t, const double& p, bool (&not_zero)[size][size][size])
+{
+    system_data res;
+    bool chosen[size][size][size];
+    size_t x, y, z;
+    size_t length;
+    double w;
+    std::vector<size_t> claster_x, claster_y, claster_z;
+    static size_t turns = 5;
+    mvector<double, 3> r;
+
+    for(int t = 0;t < await_t + obser_t;t++){
+        for(int i = 0;i < size;i++)
+            for(int j = 0;j < size;j++)
+                for(int k = 0;k < size;k++)
+                    chosen[i][j][k] = false;
+        for(int tur = 0;tur < turns;tur++){
+            r = random_normal();
+            x = gen()/quant;
+            y = gen()/quant;
+            z = gen()/quant;
+            chosen[x][y][z] = true;
+            claster_x.resize(1);
+            claster_y.resize(1);
+            claster_z.resize(1);
+            claster_x[0] = x;
+            claster_y[0] = y;
+            claster_z[0] = z;
+            length = 1;
+            for(int i = 0;i < size;i++)
+                for(int j = 0;j < size;j++)
+                    for(int k = 0;k < size;k++)
+                        if(!chosen[i][j][k]){
+                            w = (system[i][j][k]*r)*(system[x][y][z]*r);
+                            if(1.0 - std::exp(-2.0*w/T) < uniform_distribution(0.0 ,1.0))
+                            {
+                                chosen[i][j][k] = true;
+                                claster_x.push_back(x);
+                                claster_y.push_back(y);
+                                claster_z.push_back(z);
+                                length ++;
+                            }
+                        }
+            if(uniform_distribution(0.0 ,1.0) > 0.5)
+                for(int i = 0;i < length;i++)
+                    system[claster_x[i]][claster_y[i]][claster_z[i]] -= 2*(system[x][y][z]*r)*r;
+
+        }
+        if(t >= await_t)
+            res.add_values(get_m(system, p), get_c(system));
+    }
+    return res;
+}
+
 system_data metropolys_algorythm(mvector<double, N> (&system)[size][size][size],
 const double& T,const size_t& await_t, const size_t& obser_t, const double& p, bool (&not_zero)[size][size][size])
 {
@@ -137,7 +192,7 @@ int main(int argc, char* argv[])
             std::cout<<"configur - "<<j<<"\n";
             for(int T = temps - 1;T >= 0;T--){
                 std::cout<<T<<"\n";
-                result = metropolys_algorythm(model, T1 + T*(T2 - T1)/temps, await_time, observation_time, p, not_zero);
+                result = svendsen_wang(model, T1 + T*(T2 - T1)/temps, await_time, observation_time, p, not_zero);
                 std::ofstream fout("resultsbad/res_"+ std::to_string(size) + "_" + std::to_string(T1 + T*(T2 - T1)/temps) + "_" + std::to_string(rank) + ".dat", std::ios_base::app);
                 double m = 0, m_2 = 0, m_4 = 0, val;
                 for(int j = 0;j < observation_time;j++){

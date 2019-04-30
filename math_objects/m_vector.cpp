@@ -20,12 +20,28 @@ template <typename other_type,typename temp>
 }
 
 template <typename Type,size_t _size>
+    mvector<Type,_size>& mvector<Type,_size>::operator=(const mvector<Type,_size>& exemp)
+{
+    for(size_t i = 0;i <_size ;i++)
+        this->values[i] = exemp.values[i];
+    return *this;
+}
+
+template <typename Type,size_t _size>
 template <typename other_type,typename temp>
 mvector<Type,_size>& mvector<Type,_size>::operator+=(const mvector<other_type,_size>& exemp)
 {
     for(int i = 0;i < _size;i++)
-        this->values[i] += static_cast<Type>(exemp.values[i]);
+        this->values[i] += static_cast<Type>(exemp[i]);
         return *this;
+}
+
+template <typename Type,size_t _size>
+mvector<Type,_size>& mvector<Type,_size>::operator+=(const mvector<Type, _size>& exemp)
+{
+    for(int i = 0;i < _size;i++)
+        this->values[i] += exemp.values[i];
+    return *this;
 }
 
 template <typename Type,size_t _size>
@@ -33,7 +49,7 @@ template <typename other_type,typename temp>
 mvector<Type,_size>& mvector<Type,_size>::operator-=(const mvector<other_type,_size>& exemp)
 {
     for(int i = 0;i < _size;i++)
-        this->values[i] -= static_cast<Type>(exemp.values[i]);
+        this->values[i] -= static_cast<Type>(exemp[i]);
     return *this;
 }
 
@@ -55,6 +71,33 @@ mvector<Type,_size>& mvector<Type,_size>::operator/=(const other_type& exemp)
     for(int i = 0;i < _size;i++)
         this->values[i] /= static_cast<Type>(exemp);
     return *this;
+}
+
+template <typename Type,size_t _size>
+mvector<Type, _size> mvector<Type, _size>::operator+(const mvector<Type, _size>& rhs)
+{
+    mvector<Type, _size> result;
+    for(int i = 0;i < _size;i++)
+        result.values[i] = this->values[i] + rhs.values[i];
+    return result;
+}
+
+template <typename Type,size_t _size>
+mvector<Type, _size> mvector<Type, _size>::operator-(const mvector<Type, _size>& rhs)
+{
+    mvector<Type, _size> result;
+    for(int i = 0;i < _size;i++)
+        result.values[i] = this->values[i] - rhs.values[i];
+    return result;
+}
+
+template <typename Type,size_t _size>
+Type mvector<Type, _size>::operator*(const mvector<Type, _size>& rhs)
+{
+    Type result = 0;
+    for(int i = 0;i < _size;i++)
+        result += this->values[i] * rhs.values[i];
+    return result;
 }
 
 template <typename Type,size_t _size>
