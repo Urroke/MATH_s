@@ -36,7 +36,7 @@ mvector<type, size> runge_kutta<type, order, size>::operator()(const mvector<typ
             sum += init_value;
 
             for(int j = 0;j < size;j++)
-                k[i][j] = F[j](sum, t + tao*table.c[j]);
+                k[i][j] = F[j](sum, t + tao*table.c[i]);
 
          } while((k_p - k[i]).magnitude() > eps);
 

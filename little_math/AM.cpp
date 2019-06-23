@@ -5,17 +5,9 @@ mvector<type, size> method_of_gauss(matrix<type, size, size> A, mvector<type, si
 {
     mvector<size_t, size> numbers;
     mvector<type, size> x, res;
-    if(somde)
-        try{
-            numbers = sample_of_main_diagonal_elements(A ,b);
-        }catch(except val)
-        {
-            if(val != except::no_diagonal_dominance)
-                throw val;
-        }
-    else
-        for(int i = 0;i < size;i++)
-            numbers[i] = i;
+    for(int i = 0;i < size;i++)
+        numbers[i] = i;
+    numbers = sample_of_main_diagonal_elements(A ,b);
     type coef;
     for(int i = 0;i < size - 1;i++)
         for(int j = i + 1;j < size;j++){

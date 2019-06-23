@@ -19,6 +19,12 @@ public:
         return result;
     }
 
+    void derivative()
+    {
+        for(int i = size;i > 0 ;i--)
+            coefs[i] = (size - i + 1)*coefs[i - 1];
+        coefs[0] = 0.0;
+    }
     ~polynom(){;}
 };
 
@@ -48,8 +54,6 @@ mvector<type, degree + 1> method_of_min_suare(mvector<type, n> x, mvector<type, 
             xy[j] = y[j]*std::pow(x[j], i);
         b[i] = summ_power(xy, 1);
     }
-
     res = method_of_gauss(A, b, true);
-
     return res;
 }
