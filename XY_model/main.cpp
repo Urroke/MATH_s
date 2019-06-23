@@ -10,13 +10,13 @@
 
 #define N 3
 #define size 16
-constexpr int repeats_struct = 1;
+constexpr int repeats_struct = 10;
 constexpr int config = 10;
-constexpr int await_time = 1000;
-constexpr int observation_time = 2000;
-constexpr double T1 = 1.06;
-constexpr double T2 = 1.1;
-constexpr int temps = 8;
+constexpr int await_time = 5000;
+constexpr int observation_time = 10000;
+constexpr double T1 = 1.2;
+constexpr double T2 = 1.6;
+constexpr int temps = 20;
 constexpr double eps = 0.0001;
 constexpr double density = 0.8;
 std::mt19937 gen(std::time(nullptr));
@@ -126,10 +126,10 @@ int main(int argc, char* argv[])
     bool not_zero[size][size][size];
     mvector<double, N> model[size][size][size], model_c[size][size][size];
     system_data result;
-    auto start = std::chrono::system_clock::now();
     for(int i = 0;i < repeats_struct;i++){
         init_system(model_c, p, not_zero);
         for(int j = 0;j < config;j++){
+        auto start = std::chrono::system_clock::now();
             for(int a = 0;a < size;a++)
                 for(int aa = 0;aa < size;aa++)
                     for(int aaa = 0;aaa < size;aaa++)
@@ -146,13 +146,13 @@ int main(int argc, char* argv[])
                     m_2 += val*val;
                     m_4 += val*val*val*val;
                 }
-                fout<<setprecision(15)<<m<<"\t"<<m_2<<"\t"<<m_4<<"\n";
+                fout<<setprecision(15)<<m/observation_time<<"\t"<<m_2/observation_time<<"\t"<<m_4/observation_time<<"\n";
                 fout.close();
             }
+            auto end = std::chrono::system_clock::now();
+            std::chrono::duration<double> elapsed_seconds = end-start;
+            std::cout<< elapsed_seconds.count() << "s\n";
         }
     }
-    auto end = std::chrono::system_clock::now();
-    std::chrono::duration<double> elapsed_seconds = end-start;
-    std::cout<< elapsed_seconds.count() << "s\n";
     MPI_Finalize();
 }
