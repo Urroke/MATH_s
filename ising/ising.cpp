@@ -8,14 +8,14 @@
 #include "../math_objects/m_vector.h"
 #include <cstdlib>
 
-#define L 128
-#define config 25
+#define L 64
+#define config 100
 #define await 10000
 #define init_await 100
-#define observation 10000
+#define observation 20000
 #define temps 20
-#define T1 2.268
-#define T2 2.2692
+#define T1 1.8
+#define T2 2.8
 
 using spin = int;
 
@@ -167,36 +167,46 @@ system_data metropolys_algorythm(spin (&system)[L][L], const double& T,const siz
 
 int main(int argc, char* argv[])
 {
+    string directory = "results_fresh";
+    std::system(("mkdir " + directory).c_str());
     int rank, size;
-    std::string machine = ("ryzen 3 1200");
     MPI_Init(&argc, &argv);
+
     system_data result;
-    double middle_calc_time = 0;
-    double iter = temps*config;
     spin system[L][L];
+
     MPI_Comm_rank(MPI_COMM_WORLD, &rank);
     MPI_Comm_size(MPI_COMM_WORLD, &size);
+
     for(int i = 0;i < config;i++){
         init_system(system);
+
         metropolys_algorythm(system, T1, init_await, 0);
+
         std::cout<<"config - "<<i<<"\n";
+        auto start_c= std::chrono::system_clock::now();
         for(int T = temps;T >= 0;T--){
             auto start = std::chrono::system_clock::now();
+
             result = wolff_algorythm(system, T1 + T*(T2 - T1)/temps, await, observation);
-            std::ofstream fout("res/" + std::to_string(std::time(nullptr))+ "_" + machine + "res_"+ std::to_string(L) + "_" + std::to_string(T)+ "_" + std::to_string(i) + "_" + std::to_string(rank) + ".dat");
-            for(int j = 0;j < observation;j++)
-                fout<<setprecision(15)<<result.m[j]<<"\n";
-            fout.close();
+
+            std::ofstream fout(directory + "/" + std::to_string(L) + "_" + std::to_string(T1 + T*(T2 - T1)/temps) + "_" + std::to_string(rank) + ".dat", std::ios_base::app);
+            double m = 0, m_2 = 0, m_4 = 0;
+            for(int j = 0;j < observation;j++){
+                m += result.m[i];
+                m_2 += std::pow(result.m[i], 2);
+                m_4 += std::pow(result.m[i], 4);
+            }
+            m /= observation;
+            m_2 /= observation;
+            m_4 /= observation;
             auto end = std::chrono::system_clock::now();
             std::chrono::duration<double> elapsed_seconds = end-start;
-            fout<<elapsed_seconds.count()<<"\n";
-            if(T != temps||i != 0){
-                middle_calc_time *= (temps - T + i*temps);
-                middle_calc_time += elapsed_seconds.count();
-                middle_calc_time /= (temps - T + i*temps + 1);
-            } else middle_calc_time = elapsed_seconds.count();
+            fout<<m<<"\t"<<m_2<<"\t"<<m_4<<"\t"<<elapsed_seconds.count()<<"\n";
         }
-        std::cout<<(iter - (i + 1)*temps)*middle_calc_time<<"\n";
+        auto end_c = std::chrono::system_clock::now();
+        std::chrono::duration<double> elapsed_seconds_c = end_c-start_c;
+        std::cout<<elapsed_seconds_c.count()<<"\n";
     }
 
     MPI_Finalize();

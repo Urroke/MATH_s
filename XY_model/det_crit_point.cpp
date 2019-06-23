@@ -3,26 +3,35 @@
 
 int main()
 {
-    constexpr size_t N = 3;
-    constexpr size_t temps = 15;
-    constexpr size_t length = 4000;
-    constexpr size_t L = 16;
+    constexpr size_t N = 4;
+    constexpr size_t temps = 20;
+    constexpr size_t length = 1;
+    constexpr size_t L = 48;
     size_t found = 0;
-    constexpr double T1 = 1.0;
-    constexpr double T2 = 1.3;
+    constexpr double T1 = 1.00;
+    constexpr double T2 = 1.4;
     size_t stat_n = 0;
     double m_4, m_2, m, r, m_, hi, kum, m_4_l = 0.0, m_2_l = 0.0, m_l = 0.0, m_err = 0.0, hi_err = 0.0, kum_err = 0.0;
     std::ofstream fout("1Aresults_" + std::to_string(L) + ".dat");
     fout<<"T\tKUM\tKUM_ERR\tM\tM_ERR\tHI\tHI_ERR\n";
     std::vector<double> m_p, hi_p, kum_p;
+    std::string dir[2] = {"results_2", "results_0"};
     for(int T = 0;T < temps;T++)
     {
         m *= 0.0;
         m_2 *= 0.0;
         m_4 *= 0.0;
+        m_4_l = 0.0;
+        m_2_l = 0.0;
+        m_ = 0.0;
+        m_l = 0.0;
+        m_err = 0.0;
+        hi_err = 0.0;
+        kum_err = 0.0;
         found = 0;
+        for(int d = 0;d < 2;d++)
         for(int j = 0;j < N;j++){
-            std::ifstream fin("resultsbad/res_"+ std::to_string(L) + "_" + std::to_string((T*(T2 - T1)/temps + T1)) + "_" + std::to_string(j) + ".dat");
+            std::ifstream fin(dir[d] + "/res_"+ std::to_string(L) + "_" + std::to_string((T*(T2 - T1)/temps + T1)) + "_" + std::to_string(j) + ".dat");
                 if(fin.is_open())
                     while(fin>>r){
                         m += r;
@@ -50,6 +59,7 @@ int main()
 
                     }
         }
+        if(found == 0) continue;
         std::cout<<m<<"\n";
         m /= found*length;
         m_2 /= found*length;
@@ -64,9 +74,9 @@ int main()
             kum_err += std::pow(kum_p[i] - kum, 2);
         }
 
-        m_err /= stat_n*(stat_n - 1);
-        hi_err /= stat_n*(stat_n - 1);
-        kum_err /= stat_n*(stat_n - 1);
+        m_err /= m_p.size()*(m_p.size() - 1);
+        hi_err /= m_p.size()*(m_p.size() - 1);
+        kum_err /= m_p.size()*(m_p.size() - 1);
 
         m_err = std::sqrt(m_err);
         hi_err = std::sqrt(hi_err);
