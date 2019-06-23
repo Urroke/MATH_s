@@ -95,10 +95,8 @@ template <typename Type,size_t _size>
 Type mvector<Type, _size>::operator*(const mvector<Type, _size>& rhs)
 {
     Type result = 0;
-    //for(int i = 0;i < _size;i++)
-        //result += this->values[i] * rhs.values[i];
-    result = 0.37*(this->values[0] * rhs.values[0] + this->values[1] * rhs.values[1])
-    +this->values[2] * rhs.values[2];
+    for(int i = 0;i < _size;i++)
+        result += this->values[i] * rhs.values[i];
     return result;
 }
 
