@@ -65,21 +65,7 @@ system_data wolff_algorythm(spin (&system)[L][L], const double& T,const size_t& 
     size_t x, y, x_, y_;
     int sign;
     std::vector<spin> klaster_x, klaster_y;
-    static size_t turns = 10;
-    /*std::function<void(int, int)> expansion = [&](int x_, int y_)-> void{
-        if(!chosen[x_][y_]){
-            chosen[x_][y_] = true;
-            if(uniform_distribution(0.0 ,1.0) < chance*system[(x_ + 1)%L][y_]*system[x_][y_])
-                expansion((x_ + 1)%L, y_);
-            if(uniform_distribution(0.0 ,1.0) < chance*system[(x_ - 1 + L)%L][y_]*system[x_][y_])
-                expansion((x_ - 1 + L)%L, y_);
-            if(uniform_distribution(0.0 ,1.0) < chance*system[x_][(y_ + 1)%L]*system[x_][y_])
-                expansion(x_, (y_ + 1)%L);
-            if(uniform_distribution(0.0 ,1.0) < chance*system[x_][(y_ - 1 + L)%L]*system[x_][y_])
-                expansion(x_, (y_ - 1 + L)%L);
-            system[x_][y_] = sign;
-        }
-    };*/
+    static size_t turns = 8;
 
     for(int t = 0;t < await_t + obser_t;t++){
         for(int i = 0;i < turns;i++){
@@ -181,7 +167,7 @@ int main(int argc, char* argv[])
     for(int i = 0;i < config;i++){
         init_system(system);
 
-        metropolys_algorythm(system, T1, init_await, 0);
+        metropolys_algorythm(system, T1, 1, 0);
 
         std::cout<<"config - "<<i<<"\n";
         auto start_c= std::chrono::system_clock::now();
