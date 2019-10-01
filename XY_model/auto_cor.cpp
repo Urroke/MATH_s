@@ -82,6 +82,7 @@ void init_system(double& p)
             for(int j = 0;j < size;j++)
                 for(int k = 0;k < size;k++)
                     if(uniform_distribution(0.0, 1.0) < density){
+                        //model_c[i][j][k] = random_normal();
                         model_c[i][j][k] = {0, 0, 1};
                         not_zero[i][j][k] = true;
                         count++;
@@ -100,6 +101,7 @@ mvector<double, N> get_m(const double& p)
         for(int j = 0;j < size;j++)
             for(int k = 0;k < size;k++)
                 res += model[i][j][k];
+
     return res/(p*size*size*size);
 }
 
@@ -148,7 +150,7 @@ system_data metropolys_algorythm(const double T, const size_t obser_t, const dou
                             model_w[i][a][aa][aaa] = model[a][aa][aaa];
                 m_w[i] = get_m(p);
             }
-            if(t > t_w[i]){
+            if(t >= t_w[i]){
                 data.m[i][t - 1] = get_m(p)*m_w[i];
                 data.c[i][t - 1] = get_cor(i, p);
             }
@@ -167,8 +169,13 @@ int main(int argc, char* argv[])
 
     system_data result;
     for(int i = 0;i < repeats_struct;i++){
-
-        init_system(p);
+        //do{
+            init_system(p);
+           // for(int a = 0;a < size;a++)
+            //    for(int aa = 0;aa < size;aa++)
+             //       for(int aaa = 0;aaa < size;aaa++)
+            //            model[a][aa][aaa] = model_c[a][aa][aaa];
+       // }while(std::abs(get_m(p).magnitude() - 0.003) > 0.001);
 
         for(int j = 0;j < config;j++){
             auto start = std::chrono::system_clock::now();
@@ -187,12 +194,12 @@ int main(int argc, char* argv[])
         result /= config;
         for(int j = 0;j < t_w_count;j++)
         {
-            std::ofstream fout1("cor/l"+ std::to_string(t_w[j]) + "_" + std::to_string(rank) + ".dat", std::ios_base::app);
+            std::ofstream fout1("low_temp/l"+ std::to_string(t_w[j]) + "_" + std::to_string(rank) + ".dat", std::ios_base::app);
             for(int k = 0;k < observation_time;k++)
                 fout1<<result.c[j][k]<<"\t";
             fout1<<"\n";
 
-            std::ofstream fout2("cor/r"+ std::to_string(t_w[j]) + "_" + std::to_string(rank) + ".dat", std::ios_base::app);
+            std::ofstream fout2("low_temp/r"+ std::to_string(t_w[j]) + "_" + std::to_string(rank) + ".dat", std::ios_base::app);
             for(int k = 0;k < observation_time;k++)
                 fout2<<result.m[j][k]<<"\t";
             fout2<<"\n";

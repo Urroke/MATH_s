@@ -9,14 +9,14 @@
 #include <iomanip>
 
 #define N 3
-#define size 16
+#define size 24
 constexpr int repeats_struct = 5;
 constexpr int config = 10;
-constexpr int await_time = 100;
-constexpr int observation_time = 4000;
-constexpr double T1 = 1.0;
-constexpr double T2 = 1.3;
-constexpr int temps = 15;
+constexpr int await_time = 0;
+constexpr int observation_time = 2000;
+constexpr double T1 = 1.1;
+constexpr double T2 = 1.1;
+constexpr int temps = 1;
 constexpr double eps = 0.0001;
 constexpr double density = 0.8;
 std::mt19937 gen(std::time(nullptr));
@@ -58,7 +58,8 @@ void init_system(mvector<double, N> (&system)[size][size][size], double& p, bool
             for(int j = 0;j < size;j++)
                 for(int k = 0;k < size;k++)
                     if(uniform_distribution(0.0, 1.0) < density){
-                        system[i][j][k] = {0, 0, 1};
+                        //system[i][j][k] = {0, 0, 1};
+                        system[i][j][k] = random_normal();
                         not_zero[i][j][k] = true;
                         count++;
                     } else {
@@ -142,6 +143,7 @@ const double& T,const size_t& await_t, const size_t& obser_t, const double& p, b
 system_data metropolys_algorythm(mvector<double, N> (&system)[size][size][size],
 const double& T,const size_t& await_t, const size_t& obser_t, const double& p, bool (&not_zero)[size][size][size])
 {
+    std::ofstream fout("blabla.dat");
     system_data data;
     mvector<double, N> old_state;
     double dE, r;
@@ -165,9 +167,13 @@ const double& T,const size_t& await_t, const size_t& obser_t, const double& p, b
                 }
             }
         }
-        if(t >= await_t)
+        if(t >= await_t){
+            double v = get_m(system, p);
+            fout<<v<<"\t";
             data.add_values(get_m(system, p), get_c(system));
+            }
     }
+    fout<<"\n";
     return data;
 }
 
@@ -192,7 +198,7 @@ int main(int argc, char* argv[])
             std::cout<<"configur - "<<j<<"\n";
             for(int T = temps - 1;T >= 0;T--){
                 std::cout<<T<<"\n";
-                result = svendsen_wang(model, T1 + T*(T2 - T1)/temps, await_time, observation_time, p, not_zero);
+                result = metropolys_algorythm(model, T1 + T*(T2 - T1)/temps, await_time, observation_time, p, not_zero);
                 std::ofstream fout("resultsbad/res_"+ std::to_string(size) + "_" + std::to_string(T1 + T*(T2 - T1)/temps) + "_" + std::to_string(rank) + ".dat", std::ios_base::app);
                 double m = 0, m_2 = 0, m_4 = 0, val;
                 for(int j = 0;j < observation_time;j++){

@@ -9,16 +9,16 @@
 #include <iomanip>
 
 #define N 3
-#define size 16
-constexpr int repeats_struct = 10;
+#define size 36
+constexpr int repeats_struct = 25;
 constexpr int config = 10;
 constexpr int await_time = 5000;
 constexpr int observation_time = 10000;
-constexpr double T1 = 1.2;
-constexpr double T2 = 1.6;
+constexpr double T1 = 0.6;
+constexpr double T2 = 1.0;
 constexpr int temps = 20;
 constexpr double eps = 0.0001;
-constexpr double density = 0.8;
+constexpr double density = 0.6;
 std::mt19937 gen(std::time(nullptr));
 constexpr auto max_val = double(gen.max());
 int quant = (gen.max())/(size) + 1;
@@ -138,7 +138,7 @@ int main(int argc, char* argv[])
             for(int T = temps - 1;T >= 0;T--){
                 std::cout<<T<<"\n";
                 result = metropolys_algorythm(model, T1 + T*(T2 - T1)/temps, await_time, observation_time, p, not_zero);
-                std::ofstream fout("resultsbad/res_"+ std::to_string(size) + "_" + std::to_string(T1 + T*(T2 - T1)/temps) + "_" + std::to_string(rank) + ".dat", std::ios_base::app);
+                std::ofstream fout("result0.6/res_"+ std::to_string(size) + "_" + std::to_string(T1 + T*(T2 - T1)/temps) + "_" + std::to_string(rank) + ".dat", std::ios_base::app);
                 double m = 0, m_2 = 0, m_4 = 0, val;
                 for(int j = 0;j < observation_time;j++){
                     val = result.m[j];

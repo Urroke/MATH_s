@@ -10,25 +10,15 @@ int main()
     constexpr size_t L = 48;
     constexpr double T1 = 2.0;
     constexpr double T2 = 2.0;
+    mvector<double, 2000> m, mres;
 
-    mvector<double, size> m, ex;
-
-    for(int T = 0;T < temps;T++)
-    {
-        std::ofstream fout("0m_T = " + std::to_string(T*(T2 - T1)/temps + T1) + "_" + std::to_string(L) + ".dat");
-        m *= 0;
-        for(int i = 0;i < config;i++){
-            for(int j = 0;j < N;j++){
-                std::ifstream fin("m/res_"+ std::to_string(L) + "_" + std::to_string(T)+ "_" + std::to_string(i) + "_" + std::to_string(j) + ".dat");
-                    if(fin.is_open()){
-                        fin>>ex;
-                        m += ex;
-                    } else std::cout<<"kek";
+        std::ifstream fin("blabla.dat");
+        for(int i = 0;i < 50;i++){
+            fin>>m;
+            mres+=m;
             }
-        }
-        m /= (N*config);
-        fout<<"T\tM\n1\t1\n";
-        for(int i = 0;i < size;i++)
-            fout<<i + 2<<"\t"<<m[i]<<"\n";
-    }
+        mres/= 50;
+         std::ofstream fout("blablabla.dat");
+         fout<<mres;
+
 }

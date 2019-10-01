@@ -3,19 +3,19 @@
 
 int main()
 {
-    constexpr size_t N = 4;
+    constexpr size_t N = 3;
     constexpr size_t temps = 20;
     constexpr size_t length = 1;
-    constexpr size_t L = 48;
+    constexpr size_t L = 24;
     size_t found = 0;
-    constexpr double T1 = 1.00;
-    constexpr double T2 = 1.4;
+    constexpr double T1 = 0.6;
+    constexpr double T2 = 1.0;
     size_t stat_n = 0;
     double m_4, m_2, m, r, m_, hi, kum, m_4_l = 0.0, m_2_l = 0.0, m_l = 0.0, m_err = 0.0, hi_err = 0.0, kum_err = 0.0;
     std::ofstream fout("1Aresults_" + std::to_string(L) + ".dat");
     fout<<"T\tKUM\tKUM_ERR\tM\tM_ERR\tHI\tHI_ERR\n";
     std::vector<double> m_p, hi_p, kum_p;
-    std::string dir[2] = {"results_2", "results_0"};
+    std::string dir[2] = {"result0.6", ""};
     for(int T = 0;T < temps;T++)
     {
         m *= 0.0;
