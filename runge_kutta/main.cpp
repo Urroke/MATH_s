@@ -14,18 +14,17 @@ int main()
     const double k = 150;
     const double m = 1;
 
-    mvector<double, size_system> cont1, extr1, cont2, extr2;
+    mvector<double, size_system> cont1, extr1, cont2, extr2, cont0, extr0;
     butcher_table<order> tabe1, tabel2;
 
-    std::ifstream fin("table.dat");
+    std::ifstream fin("table1.dat");
     fin>>tabe1.a>>tabe1.b>>tabel2.b>>tabe1.c;
     tabel2.a = tabe1.a;
     tabel2.c = tabe1.c;
 
     fin.close();
 
-    runge_kutta<double, order, size_system> rung_4(tabe1);
-    runge_kutta<double, order, size_system> rung_4_(tabel2);
+    runge_kutta<double, order, size_system> rung_4(tabe1), rung_4_(tabel2);
 
     std::array<std::function<double(mvector<double, size_system>, double)> , size_system> F = {
     [=](mvector<double, size_system> u, double t)-> double{
@@ -44,10 +43,11 @@ int main()
     rung_4 = F;
     rung_4_ = F;
     cont1 = {1.5705, l, 0.0, 0.0};
-    cont2 = cont1;
     extr1 = cont1;
-    extr2 = cont1;
-    std::ofstream fout("res.dat");
+    cont0 = cont1;
+    extr0 = cont1;
+    std::ofstream fout("solve.dat");
+    std::ofstream fout1("solve_extr.dat");
     /*for(int i = 0;i < int((T - t_0)/step);i++){
         fout<<t_0 + i*step<<"\t"<<init_data[0]<<"\n";
         init_data = rung_4(init_data, t_0 + i*step, step);
@@ -55,14 +55,11 @@ int main()
     mvector<size_t, steps_for_extropolate> dividers;
     dividers = {1, 2, 4};
     for(int i = 0;i < int((T - t_0)/step);i++){
-        fout<<t_0 + i*step<<"\t"<<cont1[0]<<"\t"<<cont1[1]
-        <<"\t"<<cont2[0]<<"\t"<<cont2[1]<<"\t"<<std::fabs(cont1[0] - cont2[0])
-        <<"\t"<<std::fabs(cont1[1] - cont2[1])<<"\t"<<extr1[0]<<"\t"<<extr1[1]
-        <<"\t"<<extr2[0]<<"\t"<<extr2[1]<<"\t"<<std::fabs(extr1[0] - extr2[0])
-        <<"\t"<<std::fabs(extr1[1] - extr2[1])<<"\n";
-        extr1 = richardson_extropolate(rung_4, t_0 + i*step, step, dividers, extr1);
-        extr2 = richardson_extropolate(rung_4_, t_0 + i*step, step, dividers, extr2);
-        cont1 = rung_4(cont1, t_0 + i*step, step);
-        cont2 = rung_4_(cont2, t_0 + i*step, step);
+        fout<<t_0 + i*step<<"\t"<<(cont1 - rung_4_(cont0, t_0 + i*step, step)).max_abs()<<"\t"<<cont1;
+        fout1<<t_0 + i*step<<"\t"<<(extr1 - richardson_extropolate(rung_4_, t_0 + i*step, step, dividers, extr0)).max_abs()<<"\t"<<extr1;
+        extr0 = extr1;
+        cont0 = cont1;
+        extr1 = richardson_extropolate(rung_4, t_0 + i*step, step, dividers, extr0);
+        cont1 = rung_4(cont0, t_0 + i*step, step);
     }
 }

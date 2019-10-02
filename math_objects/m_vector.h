@@ -67,6 +67,7 @@ public:
     Type magnitude();
     void normalize();
     Type max();
+    Type max_abs();
     Type min();
     size_t size();
 };

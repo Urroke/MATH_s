@@ -1,9 +1,11 @@
 #include "runge_kutta.h"
+#include <conio.h>
 
 template <typename type, size_t order, size_t size>
 runge_kutta<type, order, size>& runge_kutta<type, order, size>::operator=(std::array<func<type, size>, size> exemp)
 {
     F = exemp;
+    return *this;
 }
 
 template <typename type, size_t order, size_t size>
@@ -17,10 +19,8 @@ template <typename type, size_t order, size_t size>
 mvector<type, size> runge_kutta<type, order, size>::operator()(const mvector<type, size>& init_value,const type& t, const type& tao)
 {
     std::array<mvector<type, size>, order> k;
-    mvector<type, size> k_p, sum, res;
-
-    const double eps = 0.00001;
-
+    mvector<type, size> sum, res, k_p;
+    const type eps = 0.00001;
     res = init_value;
 
     for(int i = 0;i < order;i++){
@@ -39,7 +39,6 @@ mvector<type, size> runge_kutta<type, order, size>::operator()(const mvector<typ
                 k[i][j] = F[j](sum, t + tao*table.c[i]);
 
          } while((k_p - k[i]).magnitude() > eps);
-
             res += tao*table.b[i]*k[i];
         }
         return res;

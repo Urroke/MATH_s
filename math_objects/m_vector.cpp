@@ -95,10 +95,8 @@ template <typename Type,size_t _size>
 Type mvector<Type, _size>::operator*(const mvector<Type, _size>& rhs)
 {
     Type result = 0;
-    //for(int i = 0;i < _size;i++)
-        //result += this->values[i] * rhs.values[i];
-    result = 0.37*(this->values[0] * rhs.values[0] + this->values[1] * rhs.values[1])
-    +this->values[2] * rhs.values[2];
+    for(int i = 0;i < _size;i++)
+        result += this->values[i] * rhs.values[i];
     return result;
 }
 
@@ -198,7 +196,7 @@ template <typename T,size_t size>
 ostream& operator<<(ostream& out,const mvector<T,size>& exemp)
 {
     for(int i = 0;i < size;i++)
-        out<<exemp.values[i]<<"\n";
+        out<<exemp.values[i]<<"\t";
     out<<"\n";
     return out;
 }
@@ -234,6 +232,16 @@ Type mvector<Type,_size>::max()
     for(int i = 1;i < _size;i++)
         if(values[i] > result)
             result = values[i];
+    return result;
+}
+
+template<typename Type,size_t _size>
+Type mvector<Type,_size>::max_abs()
+{
+    Type result = std::fabs(values[0]);
+    for(int i = 1;i < _size;i++)
+        if(std::fabs(values[i]) > result)
+            result = std::fabs(values[i]);
     return result;
 }
 
