@@ -5,10 +5,8 @@
 template <typename input,typename output>
 class math_function{
 private:
-    output(*func)(input);
-    class integral;
-    int C(int n,int k);
-
+    std::function<output(input)> func;
+    //std::vector<std::function<output(input)>> function_stack;
     template <typename lhs, typename rhs>
     static constexpr bool is_converte = std::is_convertible<lhs, rhs>::type;
 
@@ -22,16 +20,22 @@ public:
 
     math_function();
 
+    math_function<input, output>& operator=(math_function<input, output> exemp);
+
+    math_function<input, output> operator+=(math_function<input, output> exemp);
+    math_function<input, output> operator-=(math_function<input, output> exemp);
+    math_function<input, output> operator*=(math_function<input, output> exemp);
+    math_function<input, output> operator/=(math_function<input, output> exemp);
+    //template <typename in, typename out>
+    //friend math_function<in, out> operator+(math_function<in, out> lhs, math_function<in, out> rhs);
+
+    math_function(std::function<output(input)> exemp);
+
     math_function(output(*exemp)(input));
 
     ~math_function();
 
-    template <typename temp = enable_type_arithmetic<output>>
-    output operator()(const input& argument);
-
-    template <typename temp2 = enable_type_arithmetic<output>>
-    output derivative(input argument, int n, int degree, input delta);
-
+    output operator()(input argument);
 };
 
 #include "function_object.cpp"

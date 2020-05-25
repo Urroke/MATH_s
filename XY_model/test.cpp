@@ -9,16 +9,16 @@
 #include <iomanip>
 
 #define N 3
-#define size 48
+#define size 16
 constexpr int repeats_struct = 25;
 constexpr int config = 10;
 constexpr int await_time = 5000;
 constexpr int observation_time = 10000;
-constexpr double T1 = 0.66;
-constexpr double T2 = 0.72;
-constexpr int temps = 12;
+constexpr double T1 = 0.8;
+constexpr double T2 = 1.3;
+constexpr int temps = 10;
 constexpr double eps = 0.0001;
-constexpr double density = 0.6;
+constexpr double density = 0.8;
 std::mt19937 gen(std::time(nullptr));
 constexpr auto max_val = double(gen.max());
 int quant = (gen.max())/(size) + 1;
@@ -69,14 +69,14 @@ void init_system(mvector<double, N> (&system)[size][size][size], double& p, bool
     p = count/(size*size*size);
 }
 
-double get_m(mvector<double, N> (&system)[size][size][size], const double& p)
+double get_m(mvector<double, N> (&system)[size][size][size], const double& p, int n)
 {
     mvector<double, N> res;
     for(int i = 0;i < size;i++)
         for(int j = 0;j < size;j++)
             for(int k = 0;k < size;k++)
                 res += system[i][j][k];
-    return res.magnitude()/p;
+    return std::pow(res.magnitude(), n)/p;
 }
 
 double get_c(mvector<double, N> (&system)[size][size][size])
@@ -110,15 +110,17 @@ const double& T,const size_t& await_t, const size_t& obser_t, const double& p, b
                 }
             }
         }
+        double m2 = get_m(system, p, 2);
+        double m4 = get_m(system, p, 4);
         if(t >= await_t)
-            data.add_values(get_m(system, p), get_c(system));
+            data.add_values(0.5*(3 - m4/(m2*m2)), 0);
     }
     return data;
 }
 
 int main(int argc, char* argv[])
 {
-std::string directoty  = "result0.6";
+std::string directoty  = "resultsbad";
     int rank, size_syst;
     MPI_Init(&argc, &argv);
     MPI_Comm_rank(MPI_COMM_WORLD, &rank);

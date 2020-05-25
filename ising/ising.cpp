@@ -9,13 +9,13 @@
 #include <cstdlib>
 
 #define L 64
-#define config 100
-#define await 10000
-#define init_await 100
-#define observation 20000
+#define config 50
+#define await 9000
+#define init_await 0
+#define observation 150000
 #define temps 20
-#define T1 1.8
-#define T2 2.8
+#define T1 1.5
+#define T2 3.5
 
 using spin = int;
 
@@ -27,11 +27,13 @@ std::uniform_int_distribution<int> dist(0, 1);
 struct system_data
 {
     double m[observation];
+    double e[observation];
     size_t repeats = 0, iter = 0;
 
-    void add_values(const double& m1, const double& c1)
+    void add_values(const double& m1, const double& e1)
     {
         m[iter] = m1;
+        e[iter] = e1;
         iter++;
     }
 };
@@ -54,6 +56,15 @@ double get_m(spin (&system)[L][L])
     for(int i = 0;i < L;i++)
         for(int j = 0;j < L;j++)
             res += system[i][j];
+    return std::abs(res);
+}
+
+double get_e(spin (&system)[L][L])
+{
+    double res = 0;
+    for(int i = 0;i < L;i++)
+        for(int j = 0;j < L;j++)
+            res += system[i][j]*(system[i][(j + 1)%L] + system[i][(j - 1 + L)%L] + system[(i + 1)%L][j]+system[(i - 1 + L)%L][j]);
     return std::abs(res);
 }
 
@@ -146,14 +157,14 @@ system_data metropolys_algorythm(spin (&system)[L][L], const double& T,const siz
             }
         }
         if(t >= await_t)
-            res.add_values(get_m(system), 0);
+            res.add_values(get_m(system), get_e(system));
     }
     return res;
 }
 
 int main(int argc, char* argv[])
 {
-    string directory = "results_fresh";
+    string directory = "fresh";
     std::system(("mkdir " + directory).c_str());
     int rank, size;
     MPI_Init(&argc, &argv);
@@ -174,21 +185,23 @@ int main(int argc, char* argv[])
         for(int T = temps;T >= 0;T--){
             auto start = std::chrono::system_clock::now();
 
-            result = wolff_algorythm(system, T1 + T*(T2 - T1)/temps, await, observation);
+            result = metropolys_algorythm(system, T1 + T*(T2 - T1)/temps, await, observation);
 
             std::ofstream fout(directory + "/" + std::to_string(L) + "_" + std::to_string(T1 + T*(T2 - T1)/temps) + "_" + std::to_string(rank) + ".dat", std::ios_base::app);
-            double m = 0, m_2 = 0, m_4 = 0;
+            double m = 0, m_2 = 0,e = 0, e_2 = 0;
             for(int j = 0;j < observation;j++){
                 m += result.m[i];
+                e += result.e[i];
                 m_2 += std::pow(result.m[i], 2);
-                m_4 += std::pow(result.m[i], 4);
+                e_2 += std::pow(result.e[i], 2);
             }
             m /= observation;
+            e /= observation;
             m_2 /= observation;
-            m_4 /= observation;
+            e_2 /= observation;
             auto end = std::chrono::system_clock::now();
             std::chrono::duration<double> elapsed_seconds = end-start;
-            fout<<m<<"\t"<<m_2<<"\t"<<m_4<<"\t"<<elapsed_seconds.count()<<"\n";
+            fout<<m<<"\t"<<m_2<<"\t"<<e<<"\t"<<e_2<<"\n";
         }
         auto end_c = std::chrono::system_clock::now();
         std::chrono::duration<double> elapsed_seconds_c = end_c-start_c;

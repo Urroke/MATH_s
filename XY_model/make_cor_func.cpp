@@ -5,11 +5,13 @@ int main()
 {
     constexpr int N = 3;
     constexpr int t_w_count = 4;
-    constexpr int conf = 10;
+    constexpr int conf = 2;
     constexpr int obser_t = 10000;
     constexpr int t_w[t_w_count] = {20, 40, 80, 160};
+    double density = 0.6;
     int found = 0;
-    std::string dir[] = {"low_temp/", ""};
+    std::string dir[] = {"", "all_results/auto_cor_hi_temp0.600000/"};
+    //dir[0] = "auto_cor_low_temp" + std::to_string(density) + "/";
     mvector<double, obser_t> left, right, buf;
 
     for(int j = 0;j < obser_t;j++)
@@ -46,13 +48,18 @@ int main()
         }
 
         std::ofstream fout("cor_res" + std::to_string(t_w[t]) + ".dat");
+        std::ofstream foutm("cor_mm_res" + std::to_string(t_w[t]) + ".dat");
+        std::ofstream foutc("cor_ss_res" + std::to_string(t_w[t]) + ".dat");
         //std::cout<<t<<"\n";
+        std::cout<<found<<"\n";
         for(int j = t_w[t];j < obser_t;j++)
         {
             if(j == t_w[t]) std::cout<<left[j]/found<<"\n";
             left[j] /= found;
             right[j] /= found;
             fout<<j - t_w[t] + 1<<"\t"<<left[j] - right[j]<<"\n";
+            foutm<<j - t_w[t] + 1<<"\t"<<right[j]<<"\n";
+            foutc<<j - t_w[t] + 1<<"\t"<<left[j]<<"\n";
         }
     }
 }

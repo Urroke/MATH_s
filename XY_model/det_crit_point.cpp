@@ -3,8 +3,8 @@
 
 int main()
 {
-    constexpr size_t N = 3;
-    constexpr size_t temps = 20;
+    constexpr size_t N = 6;
+    constexpr size_t temps = 10;
     constexpr size_t length = 1;
     constexpr size_t L = 24;
     size_t found = 0;
@@ -14,8 +14,12 @@ int main()
     double m_4, m_2, m, r, m_, hi, kum, m_4_l = 0.0, m_2_l = 0.0, m_l = 0.0, m_err = 0.0, hi_err = 0.0, kum_err = 0.0;
     std::ofstream fout("1Aresults_" + std::to_string(L) + ".dat");
     fout<<"T\tKUM\tKUM_ERR\tM\tM_ERR\tHI\tHI_ERR\n";
+    std::ofstream fouts("1AresultsCss_" + std::to_string(L) + ".dat");
+    fouts<<"T\tKUM\tKUM_ERR\tM\tM_ERR\tHI\tHI_ERR\n";
+    std::ofstream foutm("1AresultsCmm_" + std::to_string(L) + ".dat");
+    foutm<<"T\tKUM\tKUM_ERR\tM\tM_ERR\tHI\tHI_ERR\n";
     std::vector<double> m_p, hi_p, kum_p;
-    std::string dir[2] = {"result0.6", ""};
+    std::string dir[5] = {"", "", "", "", "results0"} ;
     for(int T = 0;T < temps;T++)
     {
         m *= 0.0;
@@ -29,7 +33,7 @@ int main()
         hi_err = 0.0;
         kum_err = 0.0;
         found = 0;
-        for(int d = 0;d < 2;d++)
+        for(int d = 0;d < 5;d++)
         for(int j = 0;j < N;j++){
             std::ifstream fin(dir[d] + "/res_"+ std::to_string(L) + "_" + std::to_string((T*(T2 - T1)/temps + T1)) + "_" + std::to_string(j) + ".dat");
                 if(fin.is_open())
@@ -83,5 +87,7 @@ int main()
         kum_err = std::sqrt(kum_err);
 
         fout<<(T*(T2 - T1)/temps + T1)<<"\t"<<kum<<"\t"<<kum_err<<"\t"<<m_<<"\t"<<m_err<<"\t"<<hi<<"\t"<<hi_err<<"\n";
+        foutm<<(T*(T2 - T1)/temps + T1)<<"\t"<<kum<<"\t"<<kum_err<<"\t"<<m_<<"\t"<<m_err<<"\t"<<hi<<"\t"<<hi_err<<"\n";
+        fouts<<(T*(T2 - T1)/temps + T1)<<"\t"<<kum<<"\t"<<kum_err<<"\t"<<m_<<"\t"<<m_err<<"\t"<<hi<<"\t"<<hi_err<<"\n";
     }
 }

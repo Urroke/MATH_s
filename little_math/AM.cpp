@@ -7,7 +7,9 @@ mvector<type, size> method_of_gauss(matrix<type, size, size> A, mvector<type, si
     mvector<type, size> x, res;
     for(int i = 0;i < size;i++)
         numbers[i] = i;
+        if(somde){
     numbers = sample_of_main_diagonal_elements(A ,b);
+    }
     type coef;
     for(int i = 0;i < size - 1;i++)
         for(int j = i + 1;j < size;j++){

@@ -12,11 +12,12 @@
 #define size 100
 constexpr int repeats_struct = 20;
 constexpr int config = 15;
-constexpr int observation_time = 10000;
+constexpr int observation_time = 3000;
 constexpr double TC = 0.6904;
 constexpr double eps = 0.0001;
 constexpr double density = 0.6;
 constexpr int t_w_count = 4;
+constexpr double init_m = 1.0;
 constexpr int t_w[t_w_count] = {20, 40, 80, 160};
 std::mt19937 gen(std::time(nullptr));
 constexpr auto max_val = double(gen.max());
@@ -26,34 +27,27 @@ bool not_zero[size][size][size];
 
 struct system_data
 {
-    double m[t_w_count][observation_time];
-    double c[t_w_count][observation_time];
+    double m[observation_time];
 
     system_data()
     {
-        for(int j = 0;j < t_w_count;j++)
             for(int i = 0;i < observation_time;i++){
-                m[j][i] = 0;
-                c[j][i] = 0;
+                m[i] = 0;
             }
     }
 
     system_data operator+=(system_data exemp)
     {
-        for(int j = 0;j < t_w_count;j++)
             for(int i = 0;i < observation_time;i++){
-                m[j][i] += exemp.m[j][i];
-                c[j][i] += exemp.c[j][i];
+                m[i] += exemp.m[i];
             }
         return *this;
     }
 
     system_data operator/=(double exemp)
     {
-        for(int j = 0;j < t_w_count;j++)
             for(int i = 0;i < observation_time;i++){
-                m[j][i] /= exemp;
-                c[j][i] /= exemp;
+                m[i] /= exemp;
             }
         return *this;
     }
@@ -66,35 +60,15 @@ struct system_data
 
 mvector<double, N> random_normal()
 {
-    mvector<double, N> res;
-    do{
-        res = {uniform_distribution(-1.0, 1.0), uniform_distribution(-1.0, 1.0), uniform_distribution(-1.0, 1.0)};
-    }while(res.magnitude() > 1.0);
+    double x = uniform_distribution(-1.0, 1.0);
+    double y = uniform_distribution(-1.0, 1.0);
+    double z = uniform_distribution(-1.0, 1.0);
+    mvector<double, N> res = {x, y, z};
     return res.normalized();
 }
 
-void init_system(double& p)
-{
-    double count;
-    do{
-        count = 0;
-        for(int i = 0;i < size;i++)
-            for(int j = 0;j < size;j++)
-                for(int k = 0;k < size;k++)
-                    if(uniform_distribution(0.0, 1.0) < density){
-                        //model_c[i][j][k] = random_normal();
-                        model_c[i][j][k] = {0.577350269, 0.577350269, 0.577350269};
-                        not_zero[i][j][k] = true;
-                        count++;
-                    } else {
-                        model_c[i][j][k] = {0, 0, 0};
-                        not_zero[i][j][k] = false;
-                    }
-    }while(std::fabs(count/(size*size*size) - density) > eps);
-    p = count/(size*size*size);
-}
 
-mvector<double, N> get_m(const double& p)
+double get_m(const double& p)
 {
     mvector<double, N> res;
     for(int i = 0;i < size;i++)
@@ -102,8 +76,39 @@ mvector<double, N> get_m(const double& p)
             for(int k = 0;k < size;k++)
                 res += model[i][j][k];
 
-    return res/(p*size*size*size);
+    return (res/(p*double(size*size*size))).magnitude();
 }
+void init_system(double& p)
+{
+    double coun, m;
+    do{
+        coun = 0;
+        for(int i = 0;i < size;i++)
+            for(int j = 0;j < size;j++)
+                for(int k = 0;k < size;k++)
+                    if(uniform_distribution(0.0, 1.0) < density){
+                        /*if(uniform_distribution(0.0, 1.0) < (0.5 + init_m/2)){
+                            model_c[i][j][k] = {0, 0, 1};
+                            m += 1;
+                            }
+                        else{
+                            model_c[i][j][k] = {0, 0, -1};
+                            m -= 1;
+                        }*/
+                        model_c[i][j][k] = {0.577350269, 0.577350269, 0.577350269};
+                        //model_c[i][j][k] = random_normal();
+                        not_zero[i][j][k] = true;
+                        coun+=1;
+                    } else {
+                        model_c[i][j][k] = {0, 0, 0};
+                        not_zero[i][j][k] = false;
+                    }
+        p = coun/(size*size*size);
+
+    }while((std::fabs(p - density) > eps));//||(std::fabs(m - init_m) > eps/10));
+}
+
+
 
 double get_cor(int index, const double& p)
 {
@@ -128,7 +133,7 @@ system_data metropolys_algorythm(const double T, const size_t obser_t, const dou
             z = gen()/quant;
             if(not_zero[x][y][z]){
                 old_state = model[x][y][z];
-                 n = random_normal();
+                n = random_normal();
                 //model[x][y][z] = n;
                 model[x][y][z] = 2*(model[x][y][z]*n)*n - model[x][y][z];
                 dE = (old_state - model[x][y][z])*(model[(x + 1)%size][y][z]+
@@ -142,22 +147,10 @@ system_data metropolys_algorythm(const double T, const size_t obser_t, const dou
                 }
             }
         }
-
-
-        for(int i = 0;i < t_w_count;i++){
-            if(t == t_w[i]){
-                for(int a = 0;a < size;a++)
-                    for(int aa = 0;aa < size;aa++)
-                        for(int aaa = 0;aaa < size;aaa++)
-                            model_w[i][a][aa][aaa] = model[a][aa][aaa];
-                m_w[i] = get_m(p);
-            }
-            if(t >= t_w[i]){
-                data.m[i][t - 1] = get_m(p)*m_w[i];
-                data.c[i][t - 1] = get_cor(i, p);
-            }
+            if(t == 1)
+                std::cout<<get_m(p)<<"\n";
+            data.m[t - 1] = get_m(p);
         }
-    }
     return data;
 }
 
@@ -168,10 +161,9 @@ int main(int argc, char* argv[])
     MPI_Comm_rank(MPI_COMM_WORLD, &rank);
     MPI_Comm_size(MPI_COMM_WORLD, &size_syst);
     double p;
-
-    std::string path = "all_results/auto_cor_low_temp" + std::to_string(density);
-    std::string comand = "mkdir " + path;
-    std::system(comand.c_str());
+    std::string direct = "all_results/m_from_low_temp_in_" + std::to_string(density) + "/";
+    std::string c_direct = "mkdir " + direct;
+    std::system(c_direct.c_str());
 
     system_data result;
     for(int i = 0;i < repeats_struct;i++){
@@ -182,7 +174,6 @@ int main(int argc, char* argv[])
              //       for(int aaa = 0;aaa < size;aaa++)
             //            model[a][aa][aaa] = model_c[a][aa][aaa];
        // }while(std::abs(get_m(p).magnitude() - 0.003) > 0.001);
-
         for(int j = 0;j < config;j++){
             auto start = std::chrono::system_clock::now();
             for(int a = 0;a < size;a++)
@@ -196,24 +187,13 @@ int main(int argc, char* argv[])
             std::chrono::duration<double> elapsed_seconds = end-start;
             std::cout<< elapsed_seconds.count() << "s\n";
         }
-
         result /= config;
-        for(int j = 0;j < t_w_count;j++)
-        {
-            std::ofstream fout1(path + "/l"+ std::to_string(t_w[j]) + "_" + std::to_string(rank) + ".dat", std::ios_base::app);
-            for(int k = 0;k < observation_time;k++){
-                fout1<<result.c[j][k]<<"\t";
-                result.c[j][k] = 0.0;
-                }
-            fout1<<"\n";
-
-            std::ofstream fout2(path + "/r"+ std::to_string(t_w[j]) + "_" + std::to_string(rank) + ".dat", std::ios_base::app);
-            for(int k = 0;k < observation_time;k++){
-                fout2<<result.m[j][k]<<"\t";
-                result.m[j][k] = 0.0;
-                }
-            fout2<<"\n";
+        std::ofstream fout2(direct + std::to_string(init_m) + "_" + std::to_string(rank) + ".dat", std::ios_base::app);
+        for(int k = 0;k < observation_time;k++){
+            fout2<<result.m[k]<<"\t";
+            result.m[k] = 0;
         }
+        fout2<<"\n";
     }
     MPI_Finalize();
 }

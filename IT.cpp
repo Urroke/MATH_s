@@ -1,28 +1,27 @@
-#include "little_math/little_math.h"
+#include "math_objects/function_object.h"
 
-double func(double x)
+double f1(double x)
 {
-    return x*x*x - 7*x*x + 5*x + 4;
+    return x*x;
 }
 
-double method_of_newton(double(*func)(double), double x, double eps)
+double f2(double x)
 {
-    double x1;
-    do{
-        x1 = x;
-        x = x - 0.0002*func(x)/(-func(x + 0.0002) + 4*func(x + 0.0001) - 3*func(x));
-    }while(std::fabs(x - x1) > eps);
     return x;
 }
 
+double f3(double x)
+{
+    return x*x*x;
+}
+
+
 int main()
 {
-    std::ifstream fin("dat.dat");
-    matrix<double, 4, 4> A;
-    mvector<double, 4> b;
-    double res;
-    fin>>A>>b;
-    //std::cout<<method_of_gauss(A, b, false);
-    res = method_of_newton(func, 1, 0.0001);
-    std::cout<<res<<"\n"<<func(res);
+    math_function<double,double> f, one = f1, two = f2;
+    //std::cout<<f(5)<<"\t"<<f_(5)<<"\n";;
+    std::cout<<f1(10)<<"\n";
+    std::cout<<f3(10)<<"\n";
+    f1+=f3;
+    std::cout<<f1(5);
 }
