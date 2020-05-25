@@ -10,7 +10,7 @@ int main()
     constexpr int t_w[t_w_count] = {20, 40, 80, 160};
     double density = 0.6;
     int found = 0;
-    std::string dir[] = {"", "all_results/auto_cor_hi_temp0.600000/"};
+    std::string dir[] = {"", "all_results/chi0.600000/"};
     //dir[0] = "auto_cor_low_temp" + std::to_string(density) + "/";
     mvector<double, obser_t> left, right, buf;
 
